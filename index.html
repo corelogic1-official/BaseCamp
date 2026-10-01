@@ -1351,36 +1351,94 @@ async function copyText(text){
    LOGIN
    ========================================================= */
 
+/* =========================================================
+   LOGIN (Secured against account takeover)
+   ========================================================= */
+
 function login(){
-
-  const username=
-    document.getElementById(
-      "loginUsername"
-    ).value.trim();
-
-  const password=
-    document.getElementById(
-      "loginPassword"
-    ).value;
-
-  const error=
-    document.getElementById(
-      "loginError"
-    );
+  const username = document.getElementById("loginUsername").value.trim();
+  const password = document.getElementById("loginPassword").value;
+  const error = document.getElementById("loginError");
 
   error.classList.add("hidden");
 
-
-  if(username.length<2){
-
-    error.textContent=
-      "Username must be at least 2 characters.";
-
+  if(username.length < 2){
+    error.textContent = "Username must be at least 2 characters.";
     error.classList.remove("hidden");
-
     return;
-
   }
+
+  // 1. Check if user already exists in local storage
+  let existingUser = null;
+  for(const id in data.users){
+    const u = data.users[id];
+    if(u.username.toLowerCase() === username.toLowerCase()){
+      existingUser = u;
+      break;
+    }
+  }
+
+  if(existingUser){
+    // If it's an admin account, verify password against ADMINS object
+    if(existingUser.admin){
+      if(ADMINS[username] !== password){
+        error.textContent = "Incorrect admin password.";
+        error.classList.remove("hidden");
+        return;
+      }
+    } else {
+      // For guest accounts, check if a local device token matches, 
+      // or require them to enter their account secret/PIN if implemented.
+      // Alternatively, prevent hijacking by ensuring this browser created it,
+      // or prompt for a password if they set one.
+      
+      // Basic protection: If the account already exists locally, 
+      // check if this device owns the stored device token for it.
+      const deviceToken = localStorage.getItem("basecamp_device_token_" + existingUser.id);
+      if(existingUser.deviceToken && deviceToken !== existingUser.deviceToken){
+        // If someone else tries to log into this username from a different browser/device:
+        error.textContent = "This username is already taken on another device.";
+        error.classList.remove("hidden");
+        return;
+      }
+    }
+
+    currentUser = {
+      id: existingUser.id,
+      username: existingUser.username,
+      admin: existingUser.admin
+    };
+    existingUser.lastSeen = Date.now();
+
+  } else {
+    // Brand new user creation
+    const id = makeId();
+    const deviceToken = Math.random().toString(36).slice(2);
+    
+    // Save device token locally so only this browser can access this account
+    localStorage.setItem("basecamp_device_token_" + id, deviceToken);
+
+    data.users[id] = {
+      id,
+      username,
+      admin: false,
+      peerId: null,
+      deviceToken, // Bind account to this specific device/browser storage
+      created: Date.now(),
+      lastSeen: Date.now()
+    };
+
+    currentUser = {
+      id,
+      username,
+      admin: false
+    };
+  }
+
+  saveData();
+  saveSession();
+  enterApp();
+}
 
 
   /* ADMIN */
