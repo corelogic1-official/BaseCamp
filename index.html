@@ -2,424 +2,1177 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#020617">
 <title>BaseCamp — P2P Chat</title>
 
 <script src="https://unpkg.com/peerjs@1.5.4/dist/peerjs.min.js"></script>
 
 <style>
-*{box-sizing:border-box}
-body{
+*{
+  box-sizing:border-box;
+  -webkit-tap-highlight-color:transparent;
+}
+
+html,body{
   margin:0;
-  font-family:Inter,Arial,sans-serif;
+  width:100%;
+  height:100%;
+  overflow:hidden;
+}
+
+body{
+  font-family:Inter,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",Arial,sans-serif;
   background:#020617;
   color:#e5e7eb;
-  height:100vh;
 }
+
 button,input{
   font:inherit;
 }
+
 button{
   cursor:pointer;
 }
-.hidden{display:none!important}
 
-#login{
-  height:100vh;
+button:disabled{
+  opacity:.5;
+  cursor:not-allowed;
+}
+
+.hidden{
+  display:none!important;
+}
+
+/* =========================
+   LOGIN
+========================= */
+
+#loginScreen{
+  min-height:100dvh;
+  width:100%;
   display:flex;
   align-items:center;
   justify-content:center;
   padding:20px;
+  background:
+    radial-gradient(circle at 20% 20%,#07598544,transparent 35%),
+    radial-gradient(circle at 80% 80%,#1d4ed844,transparent 35%),
+    #020617;
 }
-.loginbox{
-  width:390px;
-  max-width:100%;
-  background:#0f172a;
+
+.loginCard{
+  width:min(420px,100%);
+  padding:32px;
   border:1px solid #1e293b;
-  border-radius:20px;
-  padding:30px;
-  box-shadow:0 20px 60px #0008;
+  border-radius:24px;
+  background:#0b1120eF;
+  box-shadow:0 25px 80px #0009;
+  backdrop-filter:blur(18px);
 }
+
 .logo{
+  display:flex;
+  align-items:center;
+  gap:10px;
   font-size:30px;
-  font-weight:800;
-  margin-bottom:6px;
+  font-weight:900;
+  letter-spacing:-1px;
 }
-.sub{
+
+.logoIcon{
+  width:44px;
+  height:44px;
+  display:grid;
+  place-items:center;
+  border-radius:13px;
+  background:linear-gradient(135deg,#0ea5e9,#2563eb);
+  box-shadow:0 8px 30px #0284c744;
+}
+
+.loginSubtitle{
+  margin:8px 0 28px;
   color:#94a3b8;
-  margin-bottom:25px;
-}
-input{
-  width:100%;
-  background:#020617;
-  color:#fff;
-  border:1px solid #334155;
-  border-radius:10px;
-  padding:12px;
-  outline:none;
-}
-input:focus{
-  border-color:#38bdf8;
-}
-button{
-  border:0;
-  border-radius:10px;
-  padding:11px 15px;
-  background:#0284c7;
-  color:white;
-  font-weight:700;
-}
-button:hover{
-  background:#0369a1;
-}
-.loginbtn{
-  width:100%;
-  margin-top:12px;
-}
-.error{
-  color:#f87171;
-  margin-top:10px;
   font-size:14px;
 }
 
-#app{
-  height:100vh;
-  display:grid;
-  grid-template-columns:280px 1fr;
+.field{
+  margin-bottom:14px;
 }
 
-.sidebar{
-  border-right:1px solid #1e293b;
-  background:#0b1120;
-  display:flex;
-  flex-direction:column;
-  min-width:0;
-}
-.sidehead{
-  padding:20px;
-  border-bottom:1px solid #1e293b;
-}
-.brand{
-  font-size:23px;
-  font-weight:800;
-}
-.tag{
-  font-size:12px;
-  color:#64748b;
-  margin-top:3px;
-}
-.me{
-  margin-top:18px;
-  padding:12px;
-  background:#111827;
-  border:1px solid #1e293b;
-  border-radius:12px;
-}
-.me-name{
+.field label{
+  display:block;
+  margin:0 0 7px;
+  color:#cbd5e1;
+  font-size:13px;
   font-weight:700;
 }
-.peerid{
-  color:#64748b;
-  font-size:11px;
-  word-break:break-all;
-  margin-top:5px;
-}
-.sidebody{
-  padding:15px;
-  overflow:auto;
-}
-.section{
-  color:#64748b;
-  font-size:11px;
-  text-transform:uppercase;
-  font-weight:800;
-  margin:12px 5px 8px;
-}
-.friend{
+
+.input{
   width:100%;
-  text-align:left;
-  background:transparent;
-  padding:11px;
-  margin-bottom:4px;
-  border-radius:9px;
-  color:#cbd5e1;
-}
-.friend:hover,
-.friend.active{
-  background:#172033;
-}
-.status{
-  display:inline-block;
-  width:8px;
-  height:8px;
-  border-radius:50%;
-  background:#64748b;
-  margin-right:7px;
-}
-.status.online{
-  background:#22c55e;
-}
-.empty{
-  color:#64748b;
-  font-size:13px;
-  padding:8px 5px;
+  height:48px;
+  padding:0 14px;
+  border:1px solid #334155;
+  border-radius:12px;
+  outline:none;
+  background:#020617;
+  color:#fff;
+  transition:.2s;
 }
 
-.connectbox{
-  margin-top:15px;
-  padding:13px;
-  background:#0f172a;
+.input:focus{
+  border-color:#38bdf8;
+  box-shadow:0 0 0 3px #0ea5e922;
+}
+
+.loginButton{
+  width:100%;
+  height:48px;
+  margin-top:4px;
+  border:0;
+  border-radius:12px;
+  color:#fff;
+  font-weight:800;
+  background:linear-gradient(135deg,#0284c7,#2563eb);
+}
+
+.loginButton:hover{
+  filter:brightness(1.08);
+}
+
+.loginError{
+  min-height:20px;
+  margin-top:12px;
+  color:#f87171;
+  text-align:center;
+  font-size:13px;
+}
+
+.demoInfo{
+  margin-top:20px;
+  padding:12px;
   border:1px solid #1e293b;
   border-radius:12px;
+  color:#64748b;
+  font-size:11px;
+  line-height:1.5;
+  text-align:center;
 }
-.connectbox input{
-  margin-top:8px;
-  font-size:12px;
-}
-.connectbox button{
-  margin-top:8px;
+
+/* =========================
+   APP
+========================= */
+
+#app{
   width:100%;
+  height:100dvh;
+  display:grid;
+  grid-template-columns:minmax(250px,300px) 1fr;
+  overflow:hidden;
 }
+
+/* =========================
+   SIDEBAR
+========================= */
+
+.sidebar{
+  min-width:0;
+  height:100%;
+  display:flex;
+  flex-direction:column;
+  background:#080f1d;
+  border-right:1px solid #1e293b;
+  z-index:20;
+}
+
+.sideTop{
+  padding:18px;
+  border-bottom:1px solid #1e293b;
+}
+
+.brand{
+  display:flex;
+  align-items:center;
+  gap:9px;
+  font-size:21px;
+  font-weight:900;
+}
+
+.brandIcon{
+  width:34px;
+  height:34px;
+  display:grid;
+  place-items:center;
+  border-radius:10px;
+  background:linear-gradient(135deg,#0ea5e9,#2563eb);
+  font-size:17px;
+}
+
+.brandSub{
+  margin-top:3px;
+  margin-left:43px;
+  color:#64748b;
+  font-size:10px;
+  font-weight:800;
+  letter-spacing:1.5px;
+}
+
+.profileMini{
+  margin-top:16px;
+  padding:12px;
+  border:1px solid #1e293b;
+  border-radius:13px;
+  background:#0f172a;
+}
+
+.profileName{
+  overflow:hidden;
+  text-overflow:ellipsis;
+  white-space:nowrap;
+  font-weight:800;
+}
+
+.myIdRow{
+  display:flex;
+  gap:7px;
+  align-items:center;
+  margin-top:7px;
+}
+
+.myId{
+  min-width:0;
+  flex:1;
+  color:#38bdf8;
+  font-family:monospace;
+  font-size:12px;
+  font-weight:800;
+}
+
+.copyButton{
+  flex-shrink:0;
+  padding:5px 8px;
+  border:1px solid #334155;
+  border-radius:7px;
+  background:#172033;
+  color:#cbd5e1;
+  font-size:10px;
+  font-weight:800;
+}
+
+.copyButton:hover{
+  background:#1e293b;
+}
+
+.peerStatus{
+  margin-top:7px;
+  color:#64748b;
+  font-size:10px;
+}
+
+.sideContent{
+  min-height:0;
+  flex:1;
+  overflow-y:auto;
+  padding:14px;
+}
+
+.sectionTitle{
+  margin:5px 4px 8px;
+  color:#64748b;
+  font-size:10px;
+  font-weight:900;
+  letter-spacing:1px;
+  text-transform:uppercase;
+}
+
+.friendList{
+  display:flex;
+  flex-direction:column;
+  gap:4px;
+}
+
+.friendItem{
+  width:100%;
+  min-width:0;
+  display:flex;
+  align-items:center;
+  gap:10px;
+  padding:11px;
+  border:0;
+  border-radius:10px;
+  background:transparent;
+  color:#cbd5e1;
+  text-align:left;
+}
+
+.friendItem:hover,
+.friendItem.active{
+  background:#172033;
+}
+
+.friendAvatar{
+  width:34px;
+  height:34px;
+  flex-shrink:0;
+  display:grid;
+  place-items:center;
+  border-radius:10px;
+  background:#1e293b;
+  color:#7dd3fc;
+  font-size:13px;
+  font-weight:900;
+}
+
+.friendInfo{
+  min-width:0;
+  flex:1;
+}
+
+.friendName{
+  overflow:hidden;
+  text-overflow:ellipsis;
+  white-space:nowrap;
+  font-size:13px;
+  font-weight:700;
+}
+
+.friendId{
+  margin-top:2px;
+  color:#64748b;
+  font-family:monospace;
+  font-size:9px;
+}
+
+.onlineDot{
+  width:8px;
+  height:8px;
+  flex-shrink:0;
+  border-radius:50%;
+  background:#475569;
+}
+
+.onlineDot.online{
+  background:#22c55e;
+  box-shadow:0 0 8px #22c55e88;
+}
+
+.emptyFriends{
+  padding:16px 8px;
+  color:#64748b;
+  font-size:12px;
+  line-height:1.5;
+  text-align:center;
+}
+
+.addFriendBox{
+  margin-top:18px;
+  padding:13px;
+  border:1px solid #1e293b;
+  border-radius:13px;
+  background:#0f172a;
+}
+
+.addFriendTitle{
+  margin-bottom:8px;
+  font-size:12px;
+  font-weight:800;
+}
+
+.addFriendRow{
+  display:flex;
+  gap:6px;
+}
+
+.smallInput{
+  min-width:0;
+  flex:1;
+  height:40px;
+  padding:0 10px;
+  border:1px solid #334155;
+  border-radius:9px;
+  outline:none;
+  background:#020617;
+  color:#fff;
+  font-family:monospace;
+  font-size:12px;
+  text-transform:uppercase;
+}
+
+.smallInput:focus{
+  border-color:#38bdf8;
+}
+
+.addButton{
+  flex-shrink:0;
+  width:42px;
+  border:0;
+  border-radius:9px;
+  background:#0284c7;
+  color:#fff;
+  font-size:18px;
+  font-weight:900;
+}
+
+.addHelp{
+  margin-top:7px;
+  color:#64748b;
+  font-size:9px;
+  line-height:1.4;
+}
+
+/* =========================
+   CHAT
+========================= */
 
 .main{
   min-width:0;
-  display:flex;
-  flex-direction:column;
-}
-.chathead{
-  min-height:70px;
-  border-bottom:1px solid #1e293b;
-  display:flex;
-  align-items:center;
-  padding:15px 20px;
-  justify-content:space-between;
-}
-.chatname{
-  font-weight:800;
-  font-size:18px;
-}
-.chatstate{
-  font-size:12px;
-  color:#64748b;
-  margin-top:3px;
-}
-.messages{
-  flex:1;
-  overflow:auto;
-  padding:25px;
-}
-.message{
-  max-width:70%;
-  margin-bottom:13px;
-}
-.message.mine{
-  margin-left:auto;
-}
-.bubble{
-  display:inline-block;
-  padding:10px 13px;
-  border-radius:13px;
-  background:#1e293b;
-  word-break:break-word;
-}
-.mine .bubble{
-  background:#0369a1;
-}
-.meta{
-  font-size:10px;
-  color:#64748b;
-  margin-top:4px;
-}
-.composer{
-  padding:15px;
-  border-top:1px solid #1e293b;
-  display:flex;
-  gap:9px;
-}
-.composer input{
-  flex:1;
-}
-.composer button{
-  width:90px;
-}
-.welcome{
+  min-height:0;
   height:100%;
   display:flex;
-  align-items:center;
-  justify-content:center;
-  color:#64748b;
-  text-align:center;
-  padding:30px;
-}
-.welcome strong{
-  color:#cbd5e1;
-  font-size:24px;
-  display:block;
-  margin-bottom:8px;
+  flex-direction:column;
+  background:#020617;
 }
 
-@media(max-width:700px){
+.mobileBar{
+  display:none;
+}
+
+.chatHeader{
+  min-height:72px;
+  flex-shrink:0;
+  display:flex;
+  align-items:center;
+  gap:12px;
+  padding:12px 20px;
+  border-bottom:1px solid #1e293b;
+  background:#020617;
+}
+
+.backButton{
+  display:none;
+  width:38px;
+  height:38px;
+  border:1px solid #1e293b;
+  border-radius:10px;
+  background:#0f172a;
+  color:#cbd5e1;
+}
+
+.chatAvatar{
+  width:42px;
+  height:42px;
+  display:grid;
+  place-items:center;
+  flex-shrink:0;
+  border-radius:12px;
+  background:#0c4a6e;
+  color:#7dd3fc;
+  font-weight:900;
+}
+
+.chatInfo{
+  min-width:0;
+}
+
+.chatName{
+  overflow:hidden;
+  text-overflow:ellipsis;
+  white-space:nowrap;
+  font-size:16px;
+  font-weight:900;
+}
+
+.chatState{
+  margin-top:3px;
+  color:#64748b;
+  font-size:11px;
+}
+
+.messages{
+  min-height:0;
+  flex:1;
+  overflow-y:auto;
+  padding:22px max(18px,calc((100% - 900px)/2));
+  scroll-behavior:smooth;
+}
+
+.message{
+  display:flex;
+  flex-direction:column;
+  margin-bottom:14px;
+}
+
+.message.mine{
+  align-items:flex-end;
+}
+
+.bubble{
+  max-width:min(72%,600px);
+  padding:10px 13px;
+  border-radius:15px;
+  background:#172033;
+  color:#e2e8f0;
+  word-break:break-word;
+  line-height:1.45;
+  font-size:14px;
+}
+
+.mine .bubble{
+  background:linear-gradient(135deg,#0369a1,#075985);
+  color:#fff;
+}
+
+.messageMeta{
+  margin-top:4px;
+  color:#475569;
+  font-size:9px;
+}
+
+.emptyChat{
+  height:100%;
+  display:grid;
+  place-items:center;
+  padding:30px;
+  text-align:center;
+}
+
+.emptyChatIcon{
+  width:70px;
+  height:70px;
+  margin:0 auto 15px;
+  display:grid;
+  place-items:center;
+  border-radius:20px;
+  background:#0c4a6e;
+  font-size:30px;
+}
+
+.emptyChatTitle{
+  color:#e2e8f0;
+  font-size:20px;
+  font-weight:900;
+}
+
+.emptyChatText{
+  max-width:400px;
+  margin-top:7px;
+  color:#64748b;
+  font-size:13px;
+  line-height:1.5;
+}
+
+.composer{
+  flex-shrink:0;
+  display:flex;
+  gap:8px;
+  padding:12px 15px;
+  border-top:1px solid #1e293b;
+  background:#020617;
+}
+
+.messageInput{
+  min-width:0;
+  flex:1;
+  height:46px;
+  padding:0 14px;
+  border:1px solid #334155;
+  border-radius:12px;
+  outline:none;
+  background:#0b1120;
+  color:#fff;
+}
+
+.messageInput:focus{
+  border-color:#38bdf8;
+}
+
+.sendButton{
+  width:76px;
+  flex-shrink:0;
+  border:0;
+  border-radius:12px;
+  background:linear-gradient(135deg,#0284c7,#2563eb);
+  color:#fff;
+  font-weight:900;
+}
+
+.sendButton:hover{
+  filter:brightness(1.08);
+}
+
+/* =========================
+   MOBILE DRAWER
+========================= */
+
+.overlay{
+  display:none;
+}
+
+/* =========================
+   RESPONSIVE
+========================= */
+
+@media(max-width:800px){
+
   #app{
-    grid-template-columns:90px 1fr;
+    grid-template-columns:1fr;
   }
-  .brand{
-    font-size:17px;
+
+  .sidebar{
+    position:fixed;
+    left:0;
+    top:0;
+    bottom:0;
+    width:min(310px,88vw);
+    transform:translateX(-105%);
+    transition:transform .22s ease;
+    box-shadow:20px 0 60px #0008;
   }
-  .tag,
-  .me,
-  .connectbox,
-  .section{
-    display:none;
+
+  .sidebar.open{
+    transform:translateX(0);
   }
-  .sidehead{
-    padding:15px 10px;
-    text-align:center;
+
+  .overlay{
+    position:fixed;
+    inset:0;
+    z-index:15;
+    background:#0009;
   }
-  .sidebody{
-    padding:8px;
+
+  .overlay.show{
+    display:block;
   }
-  .friend{
-    padding:12px 5px;
-    text-align:center;
+
+  .mobileBar{
+    height:58px;
+    flex-shrink:0;
+    display:flex;
+    align-items:center;
+    gap:10px;
+    padding:8px 12px;
+    border-bottom:1px solid #1e293b;
+    background:#080f1d;
   }
-  .friend .status{
-    margin:0;
+
+  .menuButton{
+    width:40px;
+    height:40px;
+    border:1px solid #1e293b;
+    border-radius:10px;
+    background:#0f172a;
+    color:#fff;
+    font-size:19px;
   }
-  .friend span.name{
-    display:none;
+
+  .mobileBrand{
+    font-weight:900;
   }
+
+  .mobileMyId{
+    margin-left:auto;
+    color:#38bdf8;
+    font-family:monospace;
+    font-size:11px;
+    font-weight:800;
+  }
+
+  .chatHeader{
+    min-height:65px;
+    padding:10px 13px;
+  }
+
+  .backButton{
+    display:block;
+  }
+
+  .messages{
+    padding:16px 12px;
+  }
+
+  .bubble{
+    max-width:84%;
+  }
+
+  .composer{
+    padding:
+      9px
+      10px
+      max(9px,env(safe-area-inset-bottom));
+  }
+
+  .sendButton{
+    width:64px;
+  }
+}
+
+@media(max-width:480px){
+
+  .loginCard{
+    padding:24px 18px;
+    border-radius:19px;
+  }
+
+  .logo{
+    font-size:27px;
+  }
+
+  .loginSubtitle{
+    margin-bottom:22px;
+  }
+
+  .bubble{
+    max-width:88%;
+    font-size:14px;
+  }
+
+  .chatAvatar{
+    width:38px;
+    height:38px;
+  }
+
+  .chatName{
+    font-size:15px;
+  }
+
+  .messageInput{
+    height:44px;
+  }
+
+  .sendButton{
+    height:44px;
+  }
+}
+
+@media(min-width:1400px){
+
+  #app{
+    grid-template-columns:320px 1fr;
+  }
+
+  .sideTop{
+    padding:22px;
+  }
+
+  .sideContent{
+    padding:18px;
+  }
+
+  .chatHeader{
+    padding-left:28px;
+    padding-right:28px;
+  }
+}
+
+/* =========================
+   SCROLLBARS
+========================= */
+
+*{
+  scrollbar-width:thin;
+  scrollbar-color:#334155 transparent;
+}
+
+::-webkit-scrollbar{
+  width:7px;
+}
+
+::-webkit-scrollbar-track{
+  background:transparent;
+}
+
+::-webkit-scrollbar-thumb{
+  background:#334155;
+  border-radius:20px;
 }
 </style>
 </head>
 
 <body>
 
-<!-- LOGIN -->
-<div id="login">
-  <div class="loginbox">
-    <div class="logo">⚡ BaseCamp</div>
-    <div class="sub">Simple peer-to-peer chat</div>
+<!-- =========================
+     LOGIN
+========================= -->
 
-    <input id="username" maxlength="24" placeholder="Choose your name">
-    <button class="loginbtn" onclick="login()">Enter BaseCamp</button>
+<section id="loginScreen">
 
-    <div id="loginError" class="error"></div>
+  <div class="loginCard">
+
+    <div class="logo">
+      <div class="logoIcon">⚡</div>
+      BaseCamp
+    </div>
+
+    <div class="loginSubtitle">
+      Simple peer-to-peer messaging.
+    </div>
+
+    <div class="field">
+      <label for="username">Username</label>
+      <input
+        id="username"
+        class="input"
+        autocomplete="username"
+        maxlength="20"
+        placeholder="e.g. user001"
+      >
+    </div>
+
+    <div class="field">
+      <label for="password">Password</label>
+      <input
+        id="password"
+        class="input"
+        type="password"
+        autocomplete="current-password"
+        placeholder="Your password"
+        onkeydown="if(event.key==='Enter')login()"
+      >
+    </div>
+
+    <button class="loginButton" onclick="login()">
+      Enter BaseCamp
+    </button>
+
+    <div id="loginError" class="loginError"></div>
+
+    <div class="demoInfo">
+      100 demo accounts are built into this version.<br>
+      Example: <b>user001</b> / <b>BaseCamp001!</b>
+    </div>
+
   </div>
-</div>
 
-<!-- APP -->
+</section>
+
+
+<!-- =========================
+     APP
+========================= -->
+
 <div id="app" class="hidden">
 
-  <aside class="sidebar">
+  <div id="overlay" class="overlay" onclick="closeSidebar()"></div>
 
-    <div class="sidehead">
-      <div class="brand">⚡ BaseCamp</div>
-      <div class="tag">P2P CHANNELS</div>
+  <aside id="sidebar" class="sidebar">
 
-      <div class="me">
-        <div class="me-name" id="myName"></div>
-        <div class="peerid" id="myPeerId">Connecting...</div>
-      </div>
-    </div>
+    <div class="sideTop">
 
-    <div class="sidebody">
-
-      <div class="section">Friends</div>
-
-      <div id="friends"></div>
-
-      <div class="connectbox">
-        <b>Connect Friend</b>
-
-        <input
-          id="friendName"
-          maxlength="24"
-          placeholder="Friend's name"
-        >
-
-        <input
-          id="friendPeerId"
-          placeholder="Friend's Peer ID"
-        >
-
-        <button onclick="connectFriend()">Connect</button>
+      <div class="brand">
+        <div class="brandIcon">⚡</div>
+        BaseCamp
       </div>
 
+      <div class="brandSub">
+        P2P CHANNELS
+      </div>
+
+      <div class="profileMini">
+
+        <div id="profileName" class="profileName">
+          User
+        </div>
+
+        <div class="myIdRow">
+
+          <div id="myFriendId" class="myId">
+            BC000
+          </div>
+
+          <button class="copyButton" onclick="copyMyId()">
+            COPY
+          </button>
+
+        </div>
+
+        <div id="peerStatus" class="peerStatus">
+          Connecting...
+        </div>
+
+      </div>
+
     </div>
+
+
+    <div class="sideContent">
+
+      <div class="sectionTitle">
+        Friends
+      </div>
+
+      <div id="friendList" class="friendList"></div>
+
+
+      <div class="addFriendBox">
+
+        <div class="addFriendTitle">
+          Add a friend
+        </div>
+
+        <div class="addFriendRow">
+
+          <input
+            id="friendIdInput"
+            class="smallInput"
+            maxlength="5"
+            placeholder="BC002"
+            oninput="this.value=this.value.toUpperCase()"
+            onkeydown="if(event.key==='Enter')addFriend()"
+          >
+
+          <button
+            class="addButton"
+            onclick="addFriend()"
+            title="Connect"
+          >
+            +
+          </button>
+
+        </div>
+
+        <div class="addHelp">
+          Ask your friend for their 5-character Friend ID.
+        </div>
+
+      </div>
+
+    </div>
+
   </aside>
+
 
   <main class="main">
 
-    <div id="welcome" class="welcome">
-      <div>
-        <strong>Welcome to BaseCamp</strong>
-        Connect to a friend using their Peer ID.
+    <div class="mobileBar">
+
+      <button class="menuButton" onclick="openSidebar()">
+        ☰
+      </button>
+
+      <div class="mobileBrand">
+        ⚡ BaseCamp
       </div>
+
+      <div id="mobileMyId" class="mobileMyId">
+        BC000
+      </div>
+
     </div>
 
-    <div id="chat" class="hidden" style="height:100%;display:flex;flex-direction:column">
 
-      <div class="chathead">
-        <div>
-          <div class="chatname" id="chatName"></div>
-          <div class="chatstate" id="chatState"></div>
+    <div id="chatHeader" class="chatHeader hidden">
+
+      <button class="backButton" onclick="showMobileFriends()">
+        ←
+      </button>
+
+      <div id="chatAvatar" class="chatAvatar">
+        ?
+      </div>
+
+      <div class="chatInfo">
+
+        <div id="chatName" class="chatName">
+          Friend
         </div>
+
+        <div id="chatState" class="chatState">
+          Offline
+        </div>
+
       </div>
 
-      <div class="messages" id="messages"></div>
+    </div>
 
-      <div class="composer">
-        <input
-          id="messageInput"
-          placeholder="Type a message..."
-          onkeydown="if(event.key==='Enter')sendMessage()"
-        >
-        <button onclick="sendMessage()">Send</button>
+
+    <div id="messages" class="messages">
+
+      <div class="emptyChat">
+
+        <div>
+
+          <div class="emptyChatIcon">
+            ⚡
+          </div>
+
+          <div class="emptyChatTitle">
+            Welcome to BaseCamp
+          </div>
+
+          <div class="emptyChatText">
+            Give your Friend ID to someone you know,
+            or enter their Friend ID on the left to start
+            a direct peer-to-peer chat.
+          </div>
+
+        </div>
+
       </div>
+
+    </div>
+
+
+    <div id="composer" class="composer hidden">
+
+      <input
+        id="messageInput"
+        class="messageInput"
+        autocomplete="off"
+        placeholder="Type a message..."
+        onkeydown="if(event.key==='Enter'&&!event.shiftKey){event.preventDefault();sendMessage()}"
+      >
+
+      <button
+        id="sendButton"
+        class="sendButton"
+        onclick="sendMessage()"
+      >
+        Send
+      </button>
 
     </div>
 
   </main>
+
 </div>
 
-<script>
-const STORAGE = "basecamp_simple_p2p";
 
-let data = {
-  profile:null,
-  friends:{},
-  messages:{}
-};
+<script>
+/* =========================================================
+   BASECAMP 100 ACCOUNT P2P CHAT
+   =========================================================
+
+   IMPORTANT:
+   This is a client-side demo system.
+
+   Accounts:
+   user001 -> BaseCamp001!
+   user002 -> BaseCamp002!
+   ...
+   user100 -> BaseCamp100!
+
+   Friend IDs:
+   BC001 -> user001
+   BC002 -> user002
+   ...
+   BC100 -> user100
+
+   PeerJS uses the Friend ID itself as the PeerJS ID.
+
+   Therefore:
+   BC001 can directly connect to BC002.
+
+   No Firebase.
+   No custom backend.
+   No database.
+
+   ========================================================= */
+
+
+/* =========================
+   CONFIG
+========================= */
+
+const STORAGE_KEY = "basecamp_100_p2p_v1";
+
+const ACCOUNT_COUNT = 100;
+
+
+/* =========================
+   APP STATE
+========================= */
+
+let currentAccount = null;
 
 let peer = null;
+
 let connections = {};
-let currentFriend = null;
+
+let currentFriendId = null;
+
+let friends = {};
+
+let messages = {};
+
+let peerReady = false;
+
+
+/* =========================
+   CREATE 100 ACCOUNTS
+========================= */
+
+const ACCOUNTS = {};
+
+for(let i = 1; i <= ACCOUNT_COUNT; i++){
+
+  const number = String(i).padStart(3,"0");
+
+  ACCOUNTS["user" + number] = {
+    username:"user" + number,
+    password:"BaseCamp" + number + "!",
+    friendId:"BC" + number
+  };
+
+}
 
 
 /* =========================
    STORAGE
 ========================= */
 
-function loadData(){
+function loadLocalData(){
+
   try{
-    const saved = localStorage.getItem(STORAGE);
 
-    if(saved){
-      const parsed = JSON.parse(saved);
+    const saved =
+      localStorage.getItem(STORAGE_KEY);
 
-      data = {
-        profile: parsed.profile || null,
-        friends: parsed.friends || {},
-        messages: parsed.messages || {}
-      };
-    }
-  }catch(e){
-    console.error(e);
+    if(!saved) return;
+
+    const parsed = JSON.parse(saved);
+
+    friends =
+      parsed.friends || {};
+
+    messages =
+      parsed.messages || {};
+
+  }catch(error){
+
+    console.error(
+      "Could not load local data:",
+      error
+    );
+
+    friends = {};
+    messages = {};
+
   }
+
 }
 
-function saveData(){
-  localStorage.setItem(STORAGE, JSON.stringify(data));
+
+function saveLocalData(){
+
+  try{
+
+    localStorage.setItem(
+      STORAGE_KEY,
+      JSON.stringify({
+        friends:friends,
+        messages:messages
+      })
+    );
+
+  }catch(error){
+
+    console.error(
+      "Could not save local data:",
+      error
+    );
+
+  }
+
 }
 
 
@@ -429,63 +1182,271 @@ function saveData(){
 
 function login(){
 
-  const input = document.getElementById("username");
-  const error = document.getElementById("loginError");
+  const username =
+    document
+      .getElementById("username")
+      .value
+      .trim()
+      .toLowerCase();
 
-  const name = input.value.trim();
+  const password =
+    document
+      .getElementById("password")
+      .value;
 
-  if(name.length < 1){
-    error.textContent = "Enter a name first.";
+  const error =
+    document.getElementById("loginError");
+
+  error.textContent = "";
+
+  const account =
+    ACCOUNTS[username];
+
+  if(!account){
+
+    error.textContent =
+      "Invalid username or password.";
+
     return;
   }
 
-  data.profile = {
-    name:name
-  };
+  if(account.password !== password){
 
-  saveData();
+    error.textContent =
+      "Invalid username or password.";
 
-  document.getElementById("login").classList.add("hidden");
-  document.getElementById("app").classList.remove("hidden");
+    return;
+  }
 
-  document.getElementById("myName").textContent = name;
+  currentAccount = account;
+
+  loadLocalData();
+
+  document
+    .getElementById("loginScreen")
+    .classList.add("hidden");
+
+  document
+    .getElementById("app")
+    .classList.remove("hidden");
+
+  document
+    .getElementById("profileName")
+    .textContent =
+      account.username;
+
+  document
+    .getElementById("myFriendId")
+    .textContent =
+      account.friendId;
+
+  document
+    .getElementById("mobileMyId")
+    .textContent =
+      account.friendId;
+
+  renderFriends();
 
   startPeer();
-  renderFriends();
+
 }
 
 
 /* =========================
-   PEER
+   PEER START
 ========================= */
 
 function startPeer(){
 
-  peer = new Peer();
+  setPeerStatus("Connecting to P2P network...");
 
-  peer.on("open", id => {
+  /*
+    The Friend ID is the actual PeerJS ID.
 
-    document.getElementById("myPeerId").textContent =
-      "Peer ID: " + id;
+    Example:
+    user001 => BC001
+    user002 => BC002
 
-    console.log("My Peer ID:", id);
+    This makes Friend IDs extremely easy to share.
+  */
+
+  peer =
+    new Peer(
+      currentAccount.friendId,
+      {
+        debug:0
+      }
+    );
+
+
+  peer.on("open", function(id){
+
+    peerReady = true;
+
+    setPeerStatus(
+      "Ready • Your Friend ID is " + id
+    );
+
+    /*
+      If a friend was previously saved,
+      try reconnecting automatically.
+    */
+
+    reconnectSavedFriends();
 
   });
 
-  peer.on("connection", conn => {
+
+  peer.on("connection", function(conn){
 
     setupConnection(conn);
 
   });
 
-  peer.on("error", err => {
 
-    console.error("Peer error:",err);
+  peer.on("error", function(error){
 
-    document.getElementById("myPeerId").textContent =
-      "Peer error: " + err.type;
+    console.error(
+      "PeerJS error:",
+      error
+    );
+
+    peerReady = false;
+
+    if(error.type === "unavailable-id"){
+
+      setPeerStatus(
+        "This account is already open somewhere else."
+      );
+
+    }else if(error.type === "peer-unavailable"){
+
+      setPeerStatus(
+        "Friend is currently offline."
+      );
+
+    }else{
+
+      setPeerStatus(
+        "P2P error: " + error.type
+      );
+
+    }
 
   });
+
+
+  peer.on("disconnected", function(){
+
+    peerReady = false;
+
+    setPeerStatus(
+      "Disconnected from signaling server..."
+    );
+
+  });
+
+
+  peer.on("close", function(){
+
+    peerReady = false;
+
+    setPeerStatus(
+      "P2P connection closed."
+    );
+
+  });
+
+}
+
+
+/* =========================
+   STATUS
+========================= */
+
+function setPeerStatus(text){
+
+  const element =
+    document.getElementById("peerStatus");
+
+  if(element){
+
+    element.textContent = text;
+
+  }
+
+}
+
+
+/* =========================
+   ADD FRIEND
+========================= */
+
+function addFriend(){
+
+  const input =
+    document.getElementById("friendIdInput");
+
+  const friendId =
+    input.value.trim().toUpperCase();
+
+  input.value = "";
+
+  if(!/^BC\d{3}$/.test(friendId)){
+
+    alert(
+      "Enter a valid Friend ID such as BC002."
+    );
+
+    return;
+
+  }
+
+  if(
+    !peerReady ||
+    !peer
+  ){
+
+    alert(
+      "Your P2P connection is not ready yet."
+    );
+
+    return;
+
+  }
+
+  if(friendId === currentAccount.friendId){
+
+    alert(
+      "You cannot add yourself."
+    );
+
+    return;
+
+  }
+
+
+  /*
+    Save the friend immediately.
+    The real name is learned when the peers exchange hello packets.
+  */
+
+  if(!friends[friendId]){
+
+    friends[friendId] = {
+      id:friendId,
+      name:"Connecting...",
+      connected:false
+    };
+
+  }
+
+  saveLocalData();
+
+  renderFriends();
+
+  connectToFriend(friendId);
+
 }
 
 
@@ -493,125 +1454,221 @@ function startPeer(){
    CONNECT
 ========================= */
 
-function connectFriend(){
+function connectToFriend(friendId){
 
-  const nameInput = document.getElementById("friendName");
-  const idInput = document.getElementById("friendPeerId");
+  if(!peer) return;
 
-  const name = nameInput.value.trim() || "Friend";
-  const peerId = idInput.value.trim();
+  if(
+    connections[friendId] &&
+    connections[friendId].open
+  ){
 
-  if(!peerId){
-    alert("Enter your friend's Peer ID.");
+    openChatById(friendId);
+
     return;
+
   }
 
-  if(peerId === peer.id){
-    alert("That's your own Peer ID.");
-    return;
-  }
 
-  const conn = peer.connect(peerId, {
-    reliable:true
-  });
+  setFriendConnectionState(
+    friendId,
+    false
+  );
 
-  conn.friendName = name;
+
+  const conn =
+    peer.connect(
+      friendId,
+      {
+        reliable:true
+      }
+    );
 
   setupConnection(conn);
 
-  nameInput.value = "";
-  idInput.value = "";
 }
 
 
 /* =========================
-   CONNECTION
+   SETUP CONNECTION
 ========================= */
 
 function setupConnection(conn){
 
   if(!conn) return;
 
-  conn.on("open", () => {
 
-    connections[conn.peer] = conn;
+  conn.on("open", function(){
+
+    const friendId =
+      conn.peer;
+
+    connections[friendId] =
+      conn;
+
+
+    /*
+      Tell the other person who we are.
+    */
 
     conn.send({
+
       type:"hello",
-      name:data.profile.name
+
+      username:
+        currentAccount.username,
+
+      friendId:
+        currentAccount.friendId
+
     });
 
-    renderFriends();
 
-    console.log("Connected:",conn.peer);
+    /*
+      Ask for the friend's identity too.
+    */
 
-  });
+    conn.send({
 
-  conn.on("data", packet => {
+      type:"identity_request"
 
-    handlePacket(conn,packet);
+    });
 
-  });
 
-  conn.on("close", () => {
+    if(!friends[friendId]){
 
-    delete connections[conn.peer];
+      friends[friendId] = {
 
-    renderFriends();
+        id:friendId,
 
-    if(
-      currentFriend &&
-      currentFriend.peerId === conn.peer
-    ){
-      updateChatState();
+        name:
+          "Friend " + friendId,
+
+        connected:true
+
+      };
+
+    }else{
+
+      friends[friendId].connected =
+        true;
+
     }
 
+    saveLocalData();
+
+    renderFriends();
+
+    updateCurrentChat();
+
   });
 
-  conn.on("error", err => {
 
-    console.error("Connection error:",err);
+  conn.on("data", function(packet){
+
+    handlePacket(
+      conn,
+      packet
+    );
 
   });
+
+
+  conn.on("close", function(){
+
+    const friendId =
+      conn.peer;
+
+    delete connections[friendId];
+
+    setFriendConnectionState(
+      friendId,
+      false
+    );
+
+    renderFriends();
+
+    updateCurrentChat();
+
+  });
+
+
+  conn.on("error", function(error){
+
+    console.error(
+      "Connection error:",
+      error
+    );
+
+    setFriendConnectionState(
+      conn.peer,
+      false
+    );
+
+    renderFriends();
+
+    updateCurrentChat();
+
+  });
+
 }
 
 
 /* =========================
-   PACKETS
+   PACKET HANDLER
 ========================= */
 
 function handlePacket(conn,packet){
 
-  if(!packet || !packet.type) return;
+  if(!packet) return;
+
+  const friendId =
+    conn.peer;
 
 
   /* HELLO */
 
   if(packet.type === "hello"){
 
-    const peerId = conn.peer;
+    const name =
+      packet.username ||
+      "Friend";
 
-    if(!data.friends[peerId]){
+    friends[friendId] = {
 
-      data.friends[peerId] = {
-        name:packet.name || "Friend",
-        peerId:peerId
-      };
+      id:friendId,
 
-    }else{
+      name:name,
 
-      data.friends[peerId].name =
-        packet.name || data.friends[peerId].name;
+      connected:true
 
-    }
+    };
 
-    saveData();
+    saveLocalData();
+
     renderFriends();
 
-    conn.send({
-      type:"hello_ack",
-      name:data.profile.name
-    });
+    updateCurrentChat();
+
+    /*
+      Confirm our identity.
+    */
+
+    if(conn.open){
+
+      conn.send({
+
+        type:"hello_ack",
+
+        username:
+          currentAccount.username,
+
+        friendId:
+          currentAccount.friendId
+
+      });
+
+    }
 
     return;
   }
@@ -621,251 +1678,858 @@ function handlePacket(conn,packet){
 
   if(packet.type === "hello_ack"){
 
-    const peerId = conn.peer;
+    const name =
+      packet.username ||
+      "Friend";
 
-    if(!data.friends[peerId]){
+    friends[friendId] = {
 
-      data.friends[peerId] = {
-        name:packet.name || conn.friendName || "Friend",
-        peerId:peerId
-      };
+      id:friendId,
 
-    }else{
+      name:name,
 
-      data.friends[peerId].name =
-        packet.name ||
-        data.friends[peerId].name;
+      connected:true
 
-    }
+    };
 
-    saveData();
+    saveLocalData();
+
     renderFriends();
+
+    updateCurrentChat();
 
     return;
   }
 
 
-  /* MESSAGE */
+  /* IDENTITY REQUEST */
+
+  if(packet.type === "identity_request"){
+
+    if(conn.open){
+
+      conn.send({
+
+        type:"identity",
+
+        username:
+          currentAccount.username,
+
+        friendId:
+          currentAccount.friendId
+
+      });
+
+    }
+
+    return;
+  }
+
+
+  /* IDENTITY */
+
+  if(packet.type === "identity"){
+
+    const name =
+      packet.username ||
+      "Friend";
+
+    friends[friendId] = {
+
+      id:friendId,
+
+      name:name,
+
+      connected:true
+
+    };
+
+    saveLocalData();
+
+    renderFriends();
+
+    updateCurrentChat();
+
+    return;
+  }
+
+
+  /* CHAT MESSAGE */
 
   if(packet.type === "message"){
 
-    const peerId = conn.peer;
-
-    if(!data.friends[peerId]){
-
-      data.friends[peerId] = {
-        name:packet.fromName || "Friend",
-        peerId:peerId
-      };
-
-    }
-
-    if(!data.messages[peerId]){
-      data.messages[peerId] = [];
-    }
-
-    data.messages[peerId].push({
-      text:packet.text,
-      mine:false,
-      time:packet.time || Date.now()
-    });
-
-    saveData();
-
-    renderFriends();
-
-    if(currentFriend && currentFriend.peerId === peerId){
-      renderMessages();
-    }
+    receiveMessage(
+      friendId,
+      packet
+    );
 
     return;
   }
+
 }
 
 
 /* =========================
-   FRIENDS
+   RECEIVE MESSAGE
 ========================= */
 
-function renderFriends(){
+function receiveMessage(
+  friendId,
+  packet
+){
 
-  const box = document.getElementById("friends");
+  if(!messages[friendId]){
 
-  box.innerHTML = "";
+    messages[friendId] = [];
 
-  const friends = Object.values(data.friends);
-
-  if(friends.length === 0){
-
-    box.innerHTML =
-      '<div class="empty">No friends connected yet.</div>';
-
-    return;
   }
 
-  friends.forEach(friend => {
 
-    const button = document.createElement("button");
+  messages[friendId].push({
 
-    button.className =
-      "friend " +
-      (
-        currentFriend &&
-        currentFriend.peerId === friend.peerId
-        ? "active"
-        : ""
-      );
+    text:
+      String(packet.text || ""),
 
-    const online =
-      !!connections[friend.peerId];
+    mine:false,
 
-    button.innerHTML =
-      `<span class="status ${online ? "online":""}"></span>` +
-      `<span class="name">${escapeHTML(friend.name)}</span>`;
-
-    button.onclick = () => openChat(friend);
-
-    box.appendChild(button);
+    time:
+      Number(packet.time) ||
+      Date.now()
 
   });
-}
 
 
-/* =========================
-   CHAT
-========================= */
+  /*
+    Make sure the sender exists in friends.
+  */
 
-function openChat(friend){
+  if(!friends[friendId]){
 
-  currentFriend = friend;
+    friends[friendId] = {
 
-  document.getElementById("welcome").classList.add("hidden");
-  document.getElementById("chat").classList.remove("hidden");
+      id:friendId,
 
-  document.getElementById("chatName").textContent =
-    friend.name;
+      name:
+        packet.from ||
+        "Friend",
 
-  updateChatState();
-  renderMessages();
+      connected:true
+
+    };
+
+  }
+
+
+  friends[friendId].connected =
+    true;
+
+
+  saveLocalData();
+
   renderFriends();
 
-  document.getElementById("messageInput").focus();
-}
 
+  if(
+    currentFriendId === friendId
+  ){
 
-function updateChatState(){
+    renderMessages();
 
-  if(!currentFriend) return;
+  }
 
-  const online =
-    !!connections[currentFriend.peerId];
-
-  document.getElementById("chatState").textContent =
-    online
-      ? "● Connected directly"
-      : "○ Offline — messages stay on this device";
-}
-
-
-function renderMessages(){
-
-  if(!currentFriend) return;
-
-  const box =
-    document.getElementById("messages");
-
-  box.innerHTML = "";
-
-  const list =
-    data.messages[currentFriend.peerId] || [];
-
-  list.forEach(message => {
-
-    const wrapper =
-      document.createElement("div");
-
-    wrapper.className =
-      "message " +
-      (message.mine ? "mine" : "");
-
-    const bubble =
-      document.createElement("div");
-
-    bubble.className = "bubble";
-    bubble.textContent = message.text;
-
-    const meta =
-      document.createElement("div");
-
-    meta.className = "meta";
-
-    meta.textContent =
-      new Date(message.time).toLocaleTimeString(
-        [],
-        {hour:"2-digit",minute:"2-digit"}
-      );
-
-    wrapper.appendChild(bubble);
-    wrapper.appendChild(meta);
-
-    box.appendChild(wrapper);
-
-  });
-
-  box.scrollTop = box.scrollHeight;
 }
 
 
 /* =========================
-   SEND
+   SEND MESSAGE
 ========================= */
 
 function sendMessage(){
 
-  if(!currentFriend) return;
+  if(!currentFriendId){
+
+    return;
+
+  }
 
   const input =
-    document.getElementById("messageInput");
+    document.getElementById(
+      "messageInput"
+    );
 
   const text =
     input.value.trim();
 
   if(!text) return;
 
-  const peerId =
-    currentFriend.peerId;
 
-  if(!data.messages[peerId]){
-    data.messages[peerId] = [];
+  const friendId =
+    currentFriendId;
+
+
+  if(!messages[friendId]){
+
+    messages[friendId] = [];
+
   }
+
 
   const message = {
+
     text:text,
+
     mine:true,
+
     time:Date.now()
+
   };
 
-  data.messages[peerId].push(message);
 
-  saveData();
+  /*
+    Always save locally.
+    This means your own chat history remains
+    available even after refreshing.
+  */
+
+  messages[friendId].push(
+    message
+  );
+
+  saveLocalData();
+
+
+  /*
+    Send over WebRTC.
+  */
 
   const conn =
-    connections[peerId];
+    connections[friendId];
 
-  if(conn && conn.open){
+
+  if(
+    conn &&
+    conn.open
+  ){
 
     conn.send({
+
       type:"message",
+
       text:text,
-      fromName:data.profile.name,
-      time:message.time
+
+      from:
+        currentAccount.username,
+
+      time:
+        message.time
+
     });
 
+  }else{
+
+    /*
+      It remains locally saved,
+      but it cannot reach the friend while
+      they are offline.
+    */
+
+    console.log(
+      "Friend is offline. Message saved locally."
+    );
+
   }
+
 
   input.value = "";
 
   renderMessages();
+
+  input.focus();
+
+}
+
+
+/* =========================
+   FRIEND STATE
+========================= */
+
+function setFriendConnectionState(
+  friendId,
+  connected
+){
+
+  if(!friends[friendId]){
+
+    friends[friendId] = {
+
+      id:friendId,
+
+      name:"Friend " + friendId,
+
+      connected:connected
+
+    };
+
+  }else{
+
+    friends[friendId].connected =
+      connected;
+
+  }
+
+  saveLocalData();
+
+}
+
+
+/* =========================
+   AUTO RECONNECT
+========================= */
+
+function reconnectSavedFriends(){
+
+  const ids =
+    Object.keys(friends);
+
+  ids.forEach(function(friendId){
+
+    if(
+      friendId !==
+      currentAccount.friendId
+    ){
+
+      setTimeout(
+        function(){
+
+          connectToFriend(
+            friendId
+          );
+
+        },
+        500
+      );
+
+    }
+
+  });
+
+}
+
+
+/* =========================
+   FRIEND LIST
+========================= */
+
+function renderFriends(){
+
+  const list =
+    document.getElementById(
+      "friendList"
+    );
+
+  list.innerHTML = "";
+
+
+  const ids =
+    Object.keys(friends);
+
+
+  if(ids.length === 0){
+
+    list.innerHTML = `
+      <div class="emptyFriends">
+        No friends yet.<br>
+        Add someone using their Friend ID.
+      </div>
+    `;
+
+    return;
+
+  }
+
+
+  ids.forEach(function(id){
+
+    const friend =
+      friends[id];
+
+
+    const button =
+      document.createElement("button");
+
+    button.className =
+      "friendItem" +
+      (
+        currentFriendId === id
+          ? " active"
+          : ""
+      );
+
+
+    const avatar =
+      document.createElement("div");
+
+    avatar.className =
+      "friendAvatar";
+
+    avatar.textContent =
+      getInitial(friend.name);
+
+
+    const info =
+      document.createElement("div");
+
+    info.className =
+      "friendInfo";
+
+
+    const name =
+      document.createElement("div");
+
+    name.className =
+      "friendName";
+
+    name.textContent =
+      friend.name || "Friend";
+
+
+    const friendId =
+      document.createElement("div");
+
+    friendId.className =
+      "friendId";
+
+    friendId.textContent =
+      id;
+
+
+    info.appendChild(name);
+    info.appendChild(friendId);
+
+
+    const dot =
+      document.createElement("div");
+
+    dot.className =
+      "onlineDot" +
+      (
+        connections[id] &&
+        connections[id].open
+          ? " online"
+          : ""
+      );
+
+
+    button.appendChild(avatar);
+    button.appendChild(info);
+    button.appendChild(dot);
+
+
+    button.onclick =
+      function(){
+
+        openChatById(id);
+
+      };
+
+
+    list.appendChild(button);
+
+  });
+
+}
+
+
+/* =========================
+   OPEN CHAT
+========================= */
+
+function openChatById(friendId){
+
+  currentFriendId =
+    friendId;
+
+
+  if(!friends[friendId]){
+
+    friends[friendId] = {
+
+      id:friendId,
+
+      name:"Friend " + friendId,
+
+      connected:false
+
+    };
+
+    saveLocalData();
+
+  }
+
+
+  document
+    .getElementById("chatHeader")
+    .classList.remove("hidden");
+
+  document
+    .getElementById("composer")
+    .classList.remove("hidden");
+
+
+  const friend =
+    friends[friendId];
+
+
+  document
+    .getElementById("chatName")
+    .textContent =
+      friend.name || "Friend";
+
+
+  document
+    .getElementById("chatAvatar")
+    .textContent =
+      getInitial(
+        friend.name
+      );
+
+
+  updateCurrentChat();
+
+  renderMessages();
+
+  renderFriends();
+
+  closeSidebar();
+
+
+  setTimeout(
+    function(){
+
+      document
+        .getElementById("messageInput")
+        .focus();
+
+    },
+    100
+  );
+
+}
+
+
+/* =========================
+   UPDATE CHAT
+========================= */
+
+function updateCurrentChat(){
+
+  if(!currentFriendId){
+
+    return;
+
+  }
+
+
+  const friend =
+    friends[currentFriendId];
+
+
+  if(!friend){
+
+    return;
+
+  }
+
+
+  document
+    .getElementById("chatName")
+    .textContent =
+      friend.name ||
+      "Friend";
+
+
+  document
+    .getElementById("chatAvatar")
+    .textContent =
+      getInitial(
+        friend.name
+      );
+
+
+  const connected =
+    !!(
+      connections[currentFriendId] &&
+      connections[currentFriendId].open
+    );
+
+
+  document
+    .getElementById("chatState")
+    .textContent =
+      connected
+        ? "● Connected directly"
+        : "○ Offline";
+
+
+  document
+    .getElementById("chatState")
+    .style.color =
+      connected
+        ? "#22c55e"
+        : "#64748b";
+
+}
+
+
+/* =========================
+   RENDER MESSAGES
+========================= */
+
+function renderMessages(){
+
+  const box =
+    document.getElementById(
+      "messages"
+    );
+
+
+  if(!currentFriendId){
+
+    box.innerHTML = `
+      <div class="emptyChat">
+
+        <div>
+
+          <div class="emptyChatIcon">
+            ⚡
+          </div>
+
+          <div class="emptyChatTitle">
+            Welcome to BaseCamp
+          </div>
+
+          <div class="emptyChatText">
+            Connect to a friend to start chatting.
+          </div>
+
+        </div>
+
+      </div>
+    `;
+
+    return;
+
+  }
+
+
+  const list =
+    messages[currentFriendId] ||
+    [];
+
+
+  box.innerHTML = "";
+
+
+  if(list.length === 0){
+
+    const friend =
+      friends[currentFriendId];
+
+
+    box.innerHTML = `
+      <div class="emptyChat">
+
+        <div>
+
+          <div class="emptyChatIcon">
+            💬
+          </div>
+
+          <div class="emptyChatTitle">
+            Chat with ${escapeHTML(
+              friend?.name || "Friend"
+            )}
+          </div>
+
+          <div class="emptyChatText">
+            Messages between you and this friend
+            will appear here.
+          </div>
+
+        </div>
+
+      </div>
+    `;
+
+    return;
+
+  }
+
+
+  list.forEach(function(message){
+
+    const wrapper =
+      document.createElement("div");
+
+    wrapper.className =
+      "message" +
+      (
+        message.mine
+          ? " mine"
+          : ""
+      );
+
+
+    const bubble =
+      document.createElement("div");
+
+    bubble.className =
+      "bubble";
+
+    bubble.textContent =
+      message.text;
+
+
+    const meta =
+      document.createElement("div");
+
+    meta.className =
+      "messageMeta";
+
+    meta.textContent =
+      formatTime(
+        message.time
+      );
+
+
+    wrapper.appendChild(
+      bubble
+    );
+
+    wrapper.appendChild(
+      meta
+    );
+
+    box.appendChild(
+      wrapper
+    );
+
+  });
+
+
+  requestAnimationFrame(
+    function(){
+
+      box.scrollTop =
+        box.scrollHeight;
+
+    }
+  );
+
+}
+
+
+/* =========================
+   COPY FRIEND ID
+========================= */
+
+async function copyMyId(){
+
+  const id =
+    currentAccount.friendId;
+
+
+  try{
+
+    await navigator.clipboard.writeText(
+      id
+    );
+
+    const button =
+      document.querySelector(
+        ".copyButton"
+      );
+
+    const old =
+      button.textContent;
+
+    button.textContent =
+      "COPIED!";
+
+
+    setTimeout(
+      function(){
+
+        button.textContent =
+          old;
+
+      },
+      1200
+    );
+
+  }catch(error){
+
+    /*
+      Fallback for browsers where
+      clipboard permissions are unavailable.
+    */
+
+    const temp =
+      document.createElement("textarea");
+
+    temp.value = id;
+
+    document.body.appendChild(temp);
+
+    temp.select();
+
+    document.execCommand("copy");
+
+    temp.remove();
+
+    alert(
+      "Friend ID copied: " + id
+    );
+
+  }
+
+}
+
+
+/* =========================
+   MOBILE SIDEBAR
+========================= */
+
+function openSidebar(){
+
+  document
+    .getElementById("sidebar")
+    .classList.add("open");
+
+  document
+    .getElementById("overlay")
+    .classList.add("show");
+
+}
+
+
+function closeSidebar(){
+
+  document
+    .getElementById("sidebar")
+    .classList.remove("open");
+
+  document
+    .getElementById("overlay")
+    .classList.remove("show");
+
+}
+
+
+function showMobileFriends(){
+
+  openSidebar();
+
 }
 
 
@@ -873,9 +2537,43 @@ function sendMessage(){
    HELPERS
 ========================= */
 
-function escapeHTML(text){
+function getInitial(name){
 
-  return String(text)
+  if(!name) return "?";
+
+  return String(name)
+    .trim()
+    .charAt(0)
+    .toUpperCase();
+
+}
+
+
+function formatTime(time){
+
+  try{
+
+    return new Date(time)
+      .toLocaleTimeString(
+        [],
+        {
+          hour:"2-digit",
+          minute:"2-digit"
+        }
+      );
+
+  }catch(error){
+
+    return "";
+
+  }
+
+}
+
+
+function escapeHTML(value){
+
+  return String(value)
     .replaceAll("&","&amp;")
     .replaceAll("<","&lt;")
     .replaceAll(">","&gt;")
@@ -889,14 +2587,19 @@ function escapeHTML(text){
    START
 ========================= */
 
-loadData();
+console.log(
+  "BaseCamp loaded."
+);
 
-if(data.profile){
+console.log(
+  "100 accounts available."
+);
 
-  document.getElementById("username").value =
-    data.profile.name;
+console.log(
+  "Example:",
+  ACCOUNTS.user001
+);
 
-}
 </script>
 
 </body>
