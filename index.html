@@ -1,118 +1,4010 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>BaseCamp Channels</title>
-  <link rel="stylesheet" href="styles.css" />
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>BaseCamp Channels — P2P</title>
+
+<script src="https://unpkg.com/peerjs@1.5.4/dist/peerjs.min.js"></script>
+
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+
+:root{
+  --bg:#020617;
+  --panel:#0f172a;
+  --panel2:#111827;
+  --border:#1e293b;
+  --text:#e5e7eb;
+  --muted:#94a3b8;
+  --blue:#38bdf8;
+  --purple:#818cf8;
+  --green:#22c55e;
+  --red:#ef4444;
+}
+
+body{
+  font-family:Inter,Segoe UI,Arial,sans-serif;
+  background:var(--bg);
+  color:var(--text);
+  height:100vh;
+  overflow:hidden;
+}
+
+button,input{
+  font:inherit;
+}
+
+button{cursor:pointer}
+
+.hidden{display:none!important}
+
+/* LOGIN */
+
+#login{
+  height:100vh;
+  display:flex;
+  justify-content:center;
+  align-items:center;
+  padding:20px;
+  background:
+    radial-gradient(circle at 15% 20%,#38bdf81c,transparent 30%),
+    radial-gradient(circle at 85% 80%,#818cf81c,transparent 30%),
+    var(--bg);
+}
+
+.login-card{
+  width:min(430px,100%);
+  background:#0f172af2;
+  border:1px solid var(--border);
+  border-radius:22px;
+  padding:32px;
+  box-shadow:0 30px 100px #000b;
+}
+
+.logo{
+  display:flex;
+  align-items:center;
+  gap:12px;
+  font-size:25px;
+  font-weight:900;
+}
+
+.logo-mark{
+  width:43px;
+  height:43px;
+  border-radius:13px;
+  display:grid;
+  place-items:center;
+  background:linear-gradient(135deg,var(--blue),var(--purple));
+  color:#020617;
+  font-weight:900;
+}
+
+.subtitle{
+  color:var(--muted);
+  margin:8px 0 25px;
+}
+
+label{
+  display:block;
+  font-size:13px;
+  color:#cbd5e1;
+  margin:14px 0 7px;
+}
+
+input{
+  width:100%;
+  padding:12px 13px;
+  border-radius:10px;
+  border:1px solid var(--border);
+  background:#020617;
+  color:var(--text);
+  outline:none;
+}
+
+input:focus{
+  border-color:var(--blue);
+}
+
+.primary{
+  width:100%;
+  margin-top:17px;
+  border:0;
+  padding:12px;
+  border-radius:10px;
+  font-weight:800;
+  color:#00111a;
+  background:linear-gradient(135deg,var(--blue),var(--purple));
+}
+
+.secondary{
+  border:1px solid var(--border);
+  background:#172033;
+  color:var(--text);
+  border-radius:9px;
+  padding:9px 12px;
+}
+
+.danger{
+  border:1px solid #7f1d1d;
+  background:#3f1010;
+  color:#fecaca;
+  border-radius:9px;
+  padding:9px 12px;
+}
+
+.small{
+  color:var(--muted);
+  font-size:12px;
+  line-height:1.5;
+  margin-top:13px;
+}
+
+.error{
+  margin-top:12px;
+  padding:10px;
+  border-radius:9px;
+  color:#fecaca;
+  background:#450a0a;
+  border:1px solid #7f1d1d;
+  font-size:13px;
+}
+
+/* APP */
+
+#app{
+  height:100vh;
+  display:grid;
+  grid-template-columns:245px minmax(0,1fr) 250px;
+}
+
+.sidebar,
+.rightbar{
+  background:#07101f;
+}
+
+.sidebar{
+  border-right:1px solid var(--border);
+  display:flex;
+  flex-direction:column;
+  min-width:0;
+}
+
+.rightbar{
+  border-left:1px solid var(--border);
+  padding:18px;
+  overflow:auto;
+}
+
+.sidebar-head{
+  padding:17px;
+  border-bottom:1px solid var(--border);
+}
+
+.brand{
+  display:flex;
+  align-items:center;
+  gap:9px;
+  font-weight:900;
+}
+
+.brand .logo-mark{
+  width:32px;
+  height:32px;
+  border-radius:9px;
+  font-size:14px;
+}
+
+.me{
+  margin-top:13px;
+  padding:10px;
+  border-radius:10px;
+  background:#0f172a;
+  border:1px solid var(--border);
+}
+
+.me-name{
+  font-weight:800;
+}
+
+.me-id{
+  color:var(--muted);
+  font-size:10px;
+  margin-top:3px;
+  overflow-wrap:anywhere;
+}
+
+.connection{
+  margin-top:8px;
+  font-size:10px;
+  color:#fbbf24;
+}
+
+.connection.online{
+  color:var(--green);
+}
+
+.side-content{
+  flex:1;
+  overflow:auto;
+  padding:12px;
+}
+
+.section-title{
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  color:#64748b;
+  font-size:11px;
+  font-weight:900;
+  letter-spacing:.08em;
+  margin:13px 7px 7px;
+}
+
+.icon-btn{
+  width:27px;
+  height:27px;
+  border-radius:7px;
+  border:1px solid var(--border);
+  background:#111827;
+  color:#cbd5e1;
+}
+
+.list-item{
+  width:100%;
+  border:1px solid transparent;
+  background:transparent;
+  color:#cbd5e1;
+  border-radius:9px;
+  padding:9px;
+  display:flex;
+  align-items:center;
+  gap:9px;
+  text-align:left;
+  margin-bottom:3px;
+}
+
+.list-item:hover,
+.list-item.active{
+  background:#172033;
+  border-color:#263449;
+}
+
+.avatar{
+  width:31px;
+  height:31px;
+  min-width:31px;
+  border-radius:9px;
+  display:grid;
+  place-items:center;
+  background:linear-gradient(135deg,#1e3a8a,#164e63);
+  font-size:11px;
+  font-weight:900;
+}
+
+.dot{
+  width:7px;
+  height:7px;
+  border-radius:50%;
+  margin-left:auto;
+  background:#64748b;
+}
+
+.dot.online{
+  background:var(--green);
+}
+
+.empty{
+  color:#64748b;
+  font-size:12px;
+  padding:8px;
+}
+
+.bottom{
+  padding:12px;
+  border-top:1px solid var(--border);
+}
+
+.bottom button{
+  width:100%;
+  margin-top:7px;
+}
+
+.admin-btn{
+  background:#1e1b4b!important;
+  border-color:#3730a3!important;
+  color:#c7d2fe!important;
+}
+
+/* CHAT */
+
+.chat{
+  display:flex;
+  flex-direction:column;
+  min-width:0;
+  background:
+    radial-gradient(circle at 50% 0%,#38bdf808,transparent 40%),
+    var(--bg);
+}
+
+.chat-head{
+  height:67px;
+  border-bottom:1px solid var(--border);
+  padding:0 20px;
+  display:flex;
+  align-items:center;
+  gap:12px;
+}
+
+.chat-title{
+  font-weight:900;
+}
+
+.chat-sub{
+  color:var(--muted);
+  font-size:12px;
+  margin-top:3px;
+}
+
+.messages{
+  flex:1;
+  overflow:auto;
+  padding:22px;
+}
+
+.welcome{
+  height:100%;
+  display:grid;
+  place-items:center;
+  text-align:center;
+  color:var(--muted);
+}
+
+.welcome-box{
+  max-width:500px;
+}
+
+.welcome h1{
+  color:#f8fafc;
+  margin-bottom:10px;
+}
+
+.message{
+  display:flex;
+  gap:10px;
+  max-width:850px;
+  margin-bottom:17px;
+}
+
+.message.mine{
+  margin-left:auto;
+  flex-direction:row-reverse;
+}
+
+.message-body{
+  max-width:min(75%,650px);
+}
+
+.message-name{
+  color:#94a3b8;
+  font-size:12px;
+  margin-bottom:4px;
+}
+
+.mine .message-name{
+  text-align:right;
+}
+
+.bubble{
+  padding:10px 13px;
+  border-radius:13px;
+  background:#111827;
+  border:1px solid var(--border);
+  white-space:pre-wrap;
+  overflow-wrap:anywhere;
+  line-height:1.45;
+}
+
+.mine .bubble{
+  background:#102a3b;
+  border-color:#164e63;
+}
+
+.time{
+  color:#64748b;
+  font-size:10px;
+  margin-top:4px;
+}
+
+.mine .time{
+  text-align:right;
+}
+
+.composer{
+  border-top:1px solid var(--border);
+  padding:13px 17px;
+  display:flex;
+  gap:9px;
+}
+
+.composer input{
+  flex:1;
+}
+
+.send{
+  border:0;
+  border-radius:10px;
+  padding:0 18px;
+  background:var(--blue);
+  color:#00111a;
+  font-weight:900;
+}
+
+/* RIGHT */
+
+.right-title{
+  color:#64748b;
+  font-size:11px;
+  font-weight:900;
+  letter-spacing:.08em;
+  margin-bottom:13px;
+}
+
+.detail-card{
+  background:#0f172a;
+  border:1px solid var(--border);
+  border-radius:12px;
+  padding:15px;
+}
+
+.detail-name{
+  font-size:18px;
+  font-weight:900;
+}
+
+.detail-line{
+  color:var(--muted);
+  font-size:12px;
+  margin-top:7px;
+  overflow-wrap:anywhere;
+}
+
+.right-actions{
+  display:flex;
+  flex-direction:column;
+  gap:7px;
+  margin-top:15px;
+}
+
+.right-actions button{
+  width:100%;
+}
+
+/* MODALS */
+
+.modal{
+  position:fixed;
+  inset:0;
+  z-index:50;
+  background:#000b;
+  display:flex;
+  justify-content:center;
+  align-items:center;
+  padding:20px;
+}
+
+.modal-card{
+  width:min(650px,100%);
+  max-height:90vh;
+  overflow:auto;
+  background:#0b1424;
+  border:1px solid var(--border);
+  border-radius:18px;
+  box-shadow:0 30px 100px #000;
+}
+
+.modal-head{
+  padding:17px 20px;
+  border-bottom:1px solid var(--border);
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+}
+
+.modal-body{
+  padding:20px;
+}
+
+.row{
+  display:flex;
+  gap:9px;
+}
+
+.row>*{
+  flex:1;
+}
+
+.notice{
+  padding:11px;
+  border-radius:10px;
+  background:#082f49;
+  border:1px solid #164e63;
+  color:#bae6fd;
+  font-size:12px;
+  line-height:1.5;
+  margin-bottom:14px;
+}
+
+.user-card,
+.group-card{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:10px;
+  padding:12px;
+  border-radius:10px;
+  background:#111827;
+  border:1px solid var(--border);
+  margin-bottom:8px;
+}
+
+.card-info{
+  min-width:0;
+}
+
+.card-name{
+  font-weight:800;
+}
+
+.card-id{
+  color:var(--muted);
+  font-size:11px;
+  overflow-wrap:anywhere;
+}
+
+.badge{
+  font-size:9px;
+  padding:3px 6px;
+  border-radius:5px;
+  background:#312e81;
+  color:#c7d2fe;
+}
+
+.toast{
+  position:fixed;
+  bottom:20px;
+  left:50%;
+  transform:translateX(-50%);
+  z-index:100;
+  padding:11px 16px;
+  border-radius:10px;
+  background:#111827;
+  border:1px solid var(--border);
+  box-shadow:0 10px 30px #0008;
+  font-size:13px;
+}
+
+.copy{
+  color:var(--blue);
+  cursor:pointer;
+}
+
+@media(max-width:900px){
+  #app{
+    grid-template-columns:210px minmax(0,1fr);
+  }
+
+  .rightbar{
+    display:none;
+  }
+}
+
+@media(max-width:650px){
+  #app{
+    grid-template-columns:1fr;
+  }
+
+  .sidebar{
+    display:none;
+  }
+
+  .message-body{
+    max-width:85%;
+  }
+}
+</style>
 </head>
+
 <body>
-  <div id="toast" class="toast hidden"></div>
 
-  <section id="auth-view" class="auth-shell">
-    <div class="auth-card">
-      <div class="brand">⚡ BaseCamp Channels</div>
-      <p class="muted">Your persistent team and personal messaging hub.</p>
+<!-- ================= LOGIN ================= -->
 
-      <div class="tabs">
-        <button class="tab active" data-auth-tab="login">Login</button>
-        <button class="tab" data-auth-tab="register">Register</button>
-      </div>
+<section id="login">
 
-      <form id="login-form" class="auth-form">
-        <input id="login-email" type="email" placeholder="Email address" required />
-        <input id="login-password" type="password" placeholder="Password" required />
-        <button class="primary" type="submit">Sign in</button>
-      </form>
+<div class="login-card">
 
-      <form id="register-form" class="auth-form hidden">
-        <input id="register-name" type="text" placeholder="Display name" maxlength="40" required />
-        <input id="register-email" type="email" placeholder="Email address" required />
-        <input id="register-password" type="password" placeholder="Password (6+ characters)" minlength="6" required />
-        <button class="primary" type="submit">Create account</button>
-      </form>
-    </div>
-  </section>
-
-  <section id="app-view" class="app-shell hidden">
-    <header class="topbar">
-      <div>
-        <div class="brand small">⚡ BaseCamp</div>
-        <div id="connection-status" class="status">Connecting…</div>
-      </div>
-      <div class="top-actions">
-        <span id="current-user-label" class="user-label"></span>
-        <button id="logout-btn" class="secondary">Logout</button>
-      </div>
-    </header>
-
-    <main class="layout">
-      <aside class="sidebar">
-        <div class="sidebar-section">
-          <div class="section-heading">
-            <span>Groups</span>
-            <button id="create-group-btn" class="icon-button" title="Create group">+</button>
-          </div>
-          <div id="group-list" class="nav-list"></div>
-        </div>
-
-        <div class="sidebar-section">
-          <div class="section-heading">
-            <span>Personal messages</span>
-            <button id="new-message-btn" class="icon-button" title="New message">+</button>
-          </div>
-          <div id="dm-list" class="nav-list"></div>
-        </div>
-
-        <div class="sidebar-footer">
-          <button id="profile-btn" class="secondary full">Profile</button>
-        </div>
-      </aside>
-
-      <section class="workspace">
-        <div class="workspace-header">
-          <div>
-            <h2 id="conversation-title">Welcome to BaseCamp</h2>
-            <p id="conversation-subtitle" class="muted">Choose a group or personal conversation.</p>
-          </div>
-          <button id="leave-group-btn" class="danger hidden">Leave group</button>
-        </div>
-
-        <div id="messages" class="messages">
-          <div class="empty-state">Select a conversation to start messaging.</div>
-        </div>
-
-        <form id="message-form" class="message-form">
-          <input id="message-input" type="text" placeholder="Select a conversation first…" maxlength="2000" disabled />
-          <button class="primary" type="submit" disabled id="send-message-btn">Send</button>
-        </form>
-      </section>
-
-      <aside class="rightbar">
-        <div class="panel">
-          <h3>Workspace</h3>
-          <p class="muted small-text">Your groups and direct conversations are stored in Firebase.</p>
-          <button id="invite-btn" class="secondary full">Invite / Join by code</button>
-          <button id="members-btn" class="secondary full">View members</button>
-        </div>
-        <div class="panel">
-          <h3>Security</h3>
-          <p class="muted small-text">Firestore rules should be deployed before sharing the app publicly.</p>
-        </div>
-      </aside>
-    </main>
-  </section>
-
-  <div id="modal" class="modal hidden">
-    <div class="modal-card">
-      <div class="modal-heading">
-        <h3 id="modal-title">Dialog</h3>
-        <button id="close-modal-btn" class="icon-button">×</button>
-      </div>
-      <div id="modal-body"></div>
-    </div>
+  <div class="logo">
+    <div class="logo-mark">⚡</div>
+    <span>BaseCamp</span>
   </div>
 
-  <script type="module" src="app.js"></script>
+  <div class="subtitle">
+    P2P Channels • Friends • Groups
+  </div>
+
+  <label>Username</label>
+  <input id="loginUsername"
+         maxlength="24"
+         placeholder="Choose a username">
+
+  <label>
+    Password
+    <span style="color:#64748b">
+      (blank = guest)
+    </span>
+  </label>
+
+  <input id="loginPassword"
+         type="password"
+         maxlength="40"
+         placeholder="Guest or admin password">
+
+  <button class="primary" onclick="login()">
+    Enter BaseCamp
+  </button>
+
+  <div id="loginError" class="error hidden"></div>
+
+  <div class="small">
+    Messages travel directly between connected devices
+    using WebRTC/P2P.
+  </div>
+
+</div>
+
+</section>
+
+
+<!-- ================= APP ================= -->
+
+<section id="app" class="hidden">
+
+<!-- SIDEBAR -->
+
+<aside class="sidebar">
+
+  <div class="sidebar-head">
+
+    <div class="brand">
+      <div class="logo-mark">⚡</div>
+      <span>BaseCamp</span>
+    </div>
+
+    <div class="me">
+
+      <div class="me-name" id="meName"></div>
+
+      <div class="me-id" id="meId"></div>
+
+      <div id="connectionStatus"
+           class="connection">
+        ● Connecting...
+      </div>
+
+    </div>
+
+  </div>
+
+
+  <div class="side-content">
+
+    <div class="section-title">
+      FRIENDS
+      <button class="icon-btn"
+              onclick="openFriendModal()">+</button>
+    </div>
+
+    <div id="friendsList"></div>
+
+
+    <div class="section-title">
+      GROUPS
+      <button class="icon-btn"
+              onclick="openGroupModal()">+</button>
+    </div>
+
+    <div id="groupsList"></div>
+
+  </div>
+
+
+  <div class="bottom">
+
+    <button class="secondary"
+            onclick="openProfileModal()">
+      Profile
+    </button>
+
+    <button class="secondary"
+            onclick="openConnectionModal()">
+      🔗 Connections
+    </button>
+
+    <button id="adminButton"
+            class="secondary admin-btn hidden"
+            onclick="openAdmin()">
+      ⚙ Admin Panel
+    </button>
+
+    <button class="secondary"
+            onclick="logout()">
+      Log out
+    </button>
+
+  </div>
+
+</aside>
+
+
+<!-- CHAT -->
+
+<main class="chat">
+
+  <header class="chat-head">
+
+    <div class="avatar" id="chatAvatar">
+      BC
+    </div>
+
+    <div>
+      <div class="chat-title"
+           id="chatTitle">
+        Welcome to BaseCamp
+      </div>
+
+      <div class="chat-sub"
+           id="chatSub">
+        Select a friend or group
+      </div>
+    </div>
+
+  </header>
+
+
+  <div class="messages"
+       id="messages">
+
+    <div class="welcome">
+
+      <div class="welcome-box">
+
+        <h1>
+          Welcome to BaseCamp ⚡
+        </h1>
+
+        <p>
+          Your messages can travel directly
+          between your devices using P2P.
+        </p>
+
+      </div>
+
+    </div>
+
+  </div>
+
+
+  <form class="composer"
+        onsubmit="sendMessage(event)">
+
+    <input id="messageInput"
+           autocomplete="off"
+           maxlength="3000"
+           disabled
+           placeholder="Select a friend or group...">
+
+    <button class="send">
+      Send
+    </button>
+
+  </form>
+
+</main>
+
+
+<!-- DETAILS -->
+
+<aside class="rightbar">
+
+  <div class="right-title">
+    DETAILS
+  </div>
+
+  <div id="details">
+
+    <div class="detail-card">
+
+      <div class="detail-name">
+        BaseCamp
+      </div>
+
+      <div class="detail-line">
+        P2P messaging workspace.
+      </div>
+
+    </div>
+
+  </div>
+
+</aside>
+
+</section>
+
+
+<!-- ================= FRIEND MODAL ================= -->
+
+<div id="friendModal"
+     class="modal hidden">
+
+<div class="modal-card">
+
+  <div class="modal-head">
+    <h2>Add Friend</h2>
+
+    <button class="icon-btn"
+            onclick="closeModal('friendModal')">
+      ×
+    </button>
+  </div>
+
+
+  <div class="modal-body">
+
+    <div class="notice">
+
+      Your friend must give you their
+      <b>Peer ID</b> or BaseCamp ID.
+
+      The Peer ID is what lets your browser
+      establish the P2P connection.
+
+    </div>
+
+
+    <label>Friend's Peer ID</label>
+
+    <input id="friendPeerInput"
+           placeholder="Paste friend's Peer ID">
+
+
+    <label>Friend's display name</label>
+
+    <input id="friendNameInput"
+           maxlength="24"
+           placeholder="Friend's username">
+
+
+    <button class="primary"
+            onclick="addFriend()">
+      Add Friend
+    </button>
+
+  </div>
+
+</div>
+</div>
+
+
+<!-- ================= CONNECTION MODAL ================= -->
+
+<div id="connectionModal"
+     class="modal hidden">
+
+<div class="modal-card">
+
+  <div class="modal-head">
+
+    <h2>🔗 P2P Connection</h2>
+
+    <button class="icon-btn"
+            onclick="closeModal('connectionModal')">
+      ×
+    </button>
+
+  </div>
+
+
+  <div class="modal-body">
+
+    <div class="notice">
+
+      Give your Peer ID to another device.
+      They can paste it into their
+      <b>Add Friend</b> screen.
+
+      Once connected, messages travel
+      directly between the devices.
+
+    </div>
+
+
+    <label>Your Peer ID</label>
+
+    <div class="row">
+
+      <input id="myPeerId"
+             readonly>
+
+      <button class="secondary"
+              onclick="copyMyPeerId()">
+        Copy
+      </button>
+
+    </div>
+
+
+    <label>Your BaseCamp ID</label>
+
+    <div class="row">
+
+      <input id="myBaseId"
+             readonly>
+
+      <button class="secondary"
+              onclick="copyText(currentUser.id)">
+        Copy
+      </button>
+
+    </div>
+
+
+    <div id="peerStatus"
+         class="small">
+      Starting P2P connection...
+    </div>
+
+  </div>
+
+</div>
+</div>
+
+
+<!-- ================= GROUP MODAL ================= -->
+
+<div id="groupModal"
+     class="modal hidden">
+
+<div class="modal-card">
+
+  <div class="modal-head">
+
+    <h2>Create / Join Group</h2>
+
+    <button class="icon-btn"
+            onclick="closeModal('groupModal')">
+      ×
+    </button>
+
+  </div>
+
+
+  <div class="modal-body">
+
+    <label>Create group</label>
+
+    <div class="row">
+
+      <input id="groupNameInput"
+             maxlength="30"
+             placeholder="Group name">
+
+      <button class="primary"
+              style="margin-top:0"
+              onclick="createGroup()">
+        Create
+      </button>
+
+    </div>
+
+
+    <label>Join group</label>
+
+    <div class="row">
+
+      <input id="groupCodeInput"
+             maxlength="10"
+             placeholder="GROUP CODE">
+
+      <button class="secondary"
+              onclick="joinGroup()">
+        Join
+      </button>
+
+    </div>
+
+
+    <div class="small">
+
+      Groups use a lightweight P2P mesh.
+      Every group member needs to be connected
+      to the other members.
+
+    </div>
+
+  </div>
+
+</div>
+</div>
+
+
+<!-- ================= PROFILE ================= -->
+
+<div id="profileModal"
+     class="modal hidden">
+
+<div class="modal-card">
+
+  <div class="modal-head">
+
+    <h2>Profile</h2>
+
+    <button class="icon-btn"
+            onclick="closeModal('profileModal')">
+      ×
+    </button>
+
+  </div>
+
+
+  <div class="modal-body">
+
+    <label>Username</label>
+
+    <input id="profileName">
+
+
+    <label>BaseCamp ID</label>
+
+    <input id="profileId"
+           readonly>
+
+
+    <button class="primary"
+            onclick="saveProfile()">
+      Save Profile
+    </button>
+
+  </div>
+
+</div>
+</div>
+
+
+<!-- ================= ADMIN ================= -->
+
+<div id="adminModal"
+     class="modal hidden">
+
+<div class="modal-card">
+
+  <div class="modal-head">
+
+    <h2>⚙ Admin Panel</h2>
+
+    <button class="icon-btn"
+            onclick="closeModal('adminModal')">
+      ×
+    </button>
+
+  </div>
+
+
+  <div class="modal-body"
+       id="adminContent">
+  </div>
+
+</div>
+</div>
+
+
+<div id="toast"
+     class="toast hidden">
+</div>
+
+
+<script>
+/* =========================================================
+   BASECAMP P2P
+   WebRTC + PeerJS
+   ========================================================= */
+
+
+/* =========================================================
+   ADMIN ACCOUNTS
+   ========================================================= */
+
+const ADMINS={
+  admin1:"12",
+  admin2:"21",
+  admin3:"11"
+};
+
+
+/* =========================================================
+   LOCAL DATA
+   ========================================================= */
+
+const STORAGE="basecamp_p2p_v2";
+
+function freshData(){
+
+  return{
+    users:{},
+    friends:{},
+    conversations:{},
+    groups:{},
+    settings:{
+      created:Date.now()
+    }
+  };
+
+}
+
+function loadData(){
+
+  try{
+
+    const raw=
+      localStorage.getItem(STORAGE);
+
+    if(raw)
+      return JSON.parse(raw);
+
+  }catch(e){}
+
+  const d=freshData();
+
+  localStorage.setItem(
+    STORAGE,
+    JSON.stringify(d)
+  );
+
+  return d;
+}
+
+let data=loadData();
+
+function saveData(){
+
+  localStorage.setItem(
+    STORAGE,
+    JSON.stringify(data)
+  );
+
+}
+
+
+/* =========================================================
+   SESSION
+   ========================================================= */
+
+let currentUser=null;
+
+let activeType=null;
+let activeId=null;
+
+let peer=null;
+
+const connections={};
+
+let peerReady=false;
+
+
+function saveSession(){
+
+  sessionStorage.setItem(
+    "basecamp_p2p_session",
+    JSON.stringify(currentUser)
+  );
+
+}
+
+function loadSession(){
+
+  try{
+
+    const raw=
+      sessionStorage.getItem(
+        "basecamp_p2p_session"
+      );
+
+    if(raw)
+      currentUser=JSON.parse(raw);
+
+  }catch(e){}
+
+}
+
+
+/* =========================================================
+   HELPERS
+   ========================================================= */
+
+function makeId(){
+
+  return "BC-"+
+    Math.random()
+      .toString(36)
+      .slice(2,10)
+      .toUpperCase();
+
+}
+
+function groupCode(){
+
+  return "BCG-"+
+    Math.random()
+      .toString(36)
+      .slice(2,8)
+      .toUpperCase();
+
+}
+
+function initials(name){
+
+  return String(name||"?")
+    .trim()
+    .split(/\s+/)
+    .slice(0,2)
+    .map(x=>x[0])
+    .join("")
+    .toUpperCase();
+
+}
+
+function escapeHTML(value){
+
+  return String(value??"")
+    .replace(/&/g,"&amp;")
+    .replace(/</g,"&lt;")
+    .replace(/>/g,"&gt;")
+    .replace(/"/g,"&quot;")
+    .replace(/'/g,"&#039;");
+
+}
+
+function timeText(t){
+
+  return new Date(t).toLocaleTimeString(
+    [],
+    {
+      hour:"2-digit",
+      minute:"2-digit"
+    }
+  );
+
+}
+
+function dateText(t){
+
+  return new Date(t).toLocaleString();
+
+}
+
+function conversationKey(a,b){
+
+  return [a,b]
+    .sort()
+    .join("__");
+
+}
+
+function toast(text){
+
+  const t=
+    document.getElementById("toast");
+
+  t.textContent=text;
+
+  t.classList.remove("hidden");
+
+  clearTimeout(window.toastTimer);
+
+  window.toastTimer=
+    setTimeout(
+      ()=>t.classList.add("hidden"),
+      2500
+    );
+
+}
+
+async function copyText(text){
+
+  try{
+
+    await navigator.clipboard.writeText(text);
+
+  }catch(e){
+
+    const ta=
+      document.createElement("textarea");
+
+    ta.value=text;
+
+    document.body.appendChild(ta);
+
+    ta.select();
+
+    document.execCommand("copy");
+
+    ta.remove();
+
+  }
+
+  toast("Copied.");
+
+}
+
+
+/* =========================================================
+   LOGIN
+   ========================================================= */
+
+function login(){
+
+  const username=
+    document.getElementById(
+      "loginUsername"
+    ).value.trim();
+
+  const password=
+    document.getElementById(
+      "loginPassword"
+    ).value;
+
+  const error=
+    document.getElementById(
+      "loginError"
+    );
+
+  error.classList.add("hidden");
+
+
+  if(username.length<2){
+
+    error.textContent=
+      "Username must be at least 2 characters.";
+
+    error.classList.remove("hidden");
+
+    return;
+
+  }
+
+
+  /* ADMIN */
+
+  if(
+    Object.prototype.hasOwnProperty.call(
+      ADMINS,
+      username
+    )
+    &&
+    ADMINS[username]===password
+  ){
+
+    const id=
+      "ADMIN-"+username.toUpperCase();
+
+    if(!data.users[id]){
+
+      data.users[id]={
+        id,
+        username,
+        admin:true,
+        peerId:null,
+        created:Date.now(),
+        lastSeen:Date.now()
+      };
+
+    }
+
+    currentUser={
+      id,
+      username,
+      admin:true
+    };
+
+    data.users[id].lastSeen=Date.now();
+
+    saveData();
+    saveSession();
+
+    enterApp();
+
+    return;
+
+  }
+
+
+  /* GUEST */
+
+  if(password){
+
+    error.textContent=
+      "Incorrect password.";
+
+    error.classList.remove("hidden");
+
+    return;
+
+  }
+
+
+  let found=null;
+
+  for(const id in data.users){
+
+    const u=data.users[id];
+
+    if(
+      !u.admin &&
+      u.username.toLowerCase()===
+      username.toLowerCase()
+    ){
+
+      found=u;
+      break;
+
+    }
+
+  }
+
+
+  if(found){
+
+    currentUser={
+      id:found.id,
+      username:found.username,
+      admin:false
+    };
+
+    found.lastSeen=Date.now();
+
+  }else{
+
+    const id=makeId();
+
+    data.users[id]={
+      id,
+      username,
+      admin:false,
+      peerId:null,
+      created:Date.now(),
+      lastSeen:Date.now()
+    };
+
+    currentUser={
+      id,
+      username,
+      admin:false
+    };
+
+  }
+
+
+  saveData();
+  saveSession();
+
+  enterApp();
+
+}
+
+
+/* =========================================================
+   ENTER APP
+   ========================================================= */
+
+function enterApp(){
+
+  document
+    .getElementById("login")
+    .classList.add("hidden");
+
+  document
+    .getElementById("app")
+    .classList.remove("hidden");
+
+
+  document.getElementById("meName")
+    .textContent=
+      currentUser.username+
+      (currentUser.admin?" ⚙":"");
+
+
+  document.getElementById("meId")
+    .textContent=
+      currentUser.id;
+
+
+  document.getElementById("adminButton")
+    .classList.toggle(
+      "hidden",
+      !currentUser.admin
+    );
+
+
+  renderSidebar();
+
+  initPeer();
+
+}
+
+
+/* =========================================================
+   LOGOUT
+   ========================================================= */
+
+function logout(){
+
+  if(peer){
+
+    try{
+      peer.destroy();
+    }catch(e){}
+
+  }
+
+  peer=null;
+  peerReady=false;
+
+  Object.keys(connections)
+    .forEach(k=>{
+      try{
+        connections[k].close();
+      }catch(e){}
+      delete connections[k];
+    });
+
+
+  currentUser=null;
+
+  sessionStorage.removeItem(
+    "basecamp_p2p_session"
+  );
+
+
+  document
+    .getElementById("app")
+    .classList.add("hidden");
+
+  document
+    .getElementById("login")
+    .classList.remove("hidden");
+
+}
+
+
+/* =========================================================
+   PEERJS
+   ========================================================= */
+
+function initPeer(){
+
+  updateConnectionStatus(
+    "Connecting..."
+  );
+
+
+  /*
+    PeerJS automatically uses its public
+    signaling server.
+
+    The actual DataConnection is WebRTC.
+  */
+
+  peer=new Peer();
+
+
+  peer.on("open",id=>{
+
+    peerReady=true;
+
+    const me=data.users[currentUser.id];
+
+    if(me){
+
+      me.peerId=id;
+      me.lastSeen=Date.now();
+
+    }
+
+    saveData();
+
+    updateConnectionStatus(
+      "● P2P ready"
+    );
+
+    updateConnectionStatus(
+      "● P2P ready",
+      true
+    );
+
+    document.getElementById(
+      "myPeerId"
+    ).value=id;
+
+    document.getElementById(
+      "myBaseId"
+    ).value=currentUser.id;
+
+    const status=
+      document.getElementById(
+        "peerStatus"
+      );
+
+    if(status){
+
+      status.innerHTML=
+        "P2P ready.<br>Peer ID: "+
+        escapeHTML(id);
+
+    }
+
+    renderSidebar();
+
+  });
+
+
+  peer.on("connection",conn=>{
+
+    setupConnection(conn);
+
+  });
+
+
+  peer.on("error",err=>{
+
+    console.error(err);
+
+    updateConnectionStatus(
+      "● P2P error"
+    );
+
+    const status=
+      document.getElementById(
+        "peerStatus"
+      );
+
+    if(status){
+
+      status.textContent=
+        "P2P error: "+err.type;
+
+    }
+
+  });
+
+
+  peer.on("disconnected",()=>{
+
+    peerReady=false;
+
+    updateConnectionStatus(
+      "● P2P disconnected"
+    );
+
+  });
+
+
+  peer.on("close",()=>{
+
+    peerReady=false;
+
+    updateConnectionStatus(
+      "● P2P closed"
+    );
+
+  });
+
+}
+
+
+/* =========================================================
+   CONNECTION SETUP
+   ========================================================= */
+
+function setupConnection(conn){
+
+  if(!conn)
+    return;
+
+
+  connections[conn.peer]=conn;
+
+
+  conn.on("open",()=>{
+
+    /*
+      Immediately identify ourselves.
+    */
+
+    conn.send({
+      type:"hello",
+      userId:currentUser.id,
+      username:currentUser.username,
+      peerId:peer.id
+    });
+
+
+    /*
+      Ask the other device for its
+      current identity.
+    */
+
+    renderSidebar();
+
+  });
+
+
+  conn.on("data",packet=>{
+
+    handlePacket(packet,conn);
+
+  });
+
+
+  conn.on("close",()=>{
+
+    delete connections[conn.peer];
+
+    renderSidebar();
+
+  });
+
+
+  conn.on("error",err=>{
+
+    console.warn(
+      "Connection error",
+      err
+    );
+
+  });
+
+}
+
+
+/* =========================================================
+   CONNECT TO FRIEND
+   ========================================================= */
+
+function connectPeer(peerId){
+
+  if(!peerReady){
+
+    toast(
+      "P2P is still starting. Try again."
+    );
+
+    return;
+
+  }
+
+
+  if(!peerId){
+
+    toast("This friend has no Peer ID.");
+
+    return;
+
+  }
+
+
+  if(peerId===peer.id){
+
+    toast("That is your own Peer ID.");
+
+    return;
+
+  }
+
+
+  if(connections[peerId]){
+
+    if(connections[peerId].open){
+
+      toast("Already connected.");
+
+      return;
+
+    }
+
+  }
+
+
+  const conn=
+    peer.connect(
+      peerId,
+      {
+        reliable:true
+      }
+    );
+
+
+  setupConnection(conn);
+
+  toast("Connecting to friend...");
+
+}
+
+
+/* =========================================================
+   PACKETS
+   ========================================================= */
+
+function handlePacket(packet,conn){
+
+  if(!packet || !packet.type)
+    return;
+
+
+  /* HELLO */
+
+  if(packet.type==="hello"){
+
+    const u=data.users[packet.userId];
+
+    if(u){
+
+      u.peerId=packet.peerId;
+      u.lastSeen=Date.now();
+
+    }
+
+    saveData();
+
+    /*
+      Send current identity back.
+    */
+
+    try{
+
+      conn.send({
+        type:"hello_ack",
+        userId:currentUser.id,
+        username:currentUser.username,
+        peerId:peer.id
+      });
+
+    }catch(e){}
+
+    renderSidebar();
+
+    return;
+
+  }
+
+
+  /* HELLO ACK */
+
+  if(packet.type==="hello_ack"){
+
+    const u=data.users[packet.userId];
+
+    if(u){
+
+      u.peerId=packet.peerId;
+      u.lastSeen=Date.now();
+
+      saveData();
+
+    }
+
+    renderSidebar();
+
+    return;
+
+  }
+
+
+  /* DM */
+
+  if(packet.type==="dm"){
+
+    receiveDM(packet);
+
+    return;
+
+  }
+
+
+  /* GROUP */
+
+  if(packet.type==="group"){
+
+    receiveGroup(packet,conn);
+
+    return;
+
+  }
+
+}
+
+
+/* =========================================================
+   FRIENDS
+   ========================================================= */
+
+function getFriends(){
+
+  if(!data.friends[currentUser.id]){
+
+    data.friends[currentUser.id]=[];
+
+  }
+
+  return data.friends[currentUser.id];
+
+}
+
+
+function renderSidebar(){
+
+  const friends=
+    document.getElementById(
+      "friendsList"
+    );
+
+  const groups=
+    document.getElementById(
+      "groupsList"
+    );
+
+
+  friends.innerHTML="";
+  groups.innerHTML="";
+
+
+  const list=getFriends();
+
+
+  if(!list.length){
+
+    friends.innerHTML=
+      `<div class="empty">
+        No friends yet.
+      </div>`;
+
+  }
+
+
+  list.forEach(id=>{
+
+    const u=data.users[id];
+
+    if(!u)
+      return;
+
+
+    const button=
+      document.createElement("button");
+
+    button.className=
+      "list-item "+
+      (
+        activeType==="dm" &&
+        activeId===id
+          ? "active"
+          : ""
+      );
+
+
+    const online=
+      u.peerId &&
+      connections[u.peerId] &&
+      connections[u.peerId].open;
+
+
+    button.innerHTML=`
+
+      <div class="avatar">
+        ${escapeHTML(initials(u.username))}
+      </div>
+
+      <span>
+        ${escapeHTML(u.username)}
+      </span>
+
+      <span class="dot
+        ${online?"online":""}">
+      </span>
+
+    `;
+
+
+    button.onclick=
+      ()=>openDM(id);
+
+
+    friends.appendChild(button);
+
+  });
+
+
+  const myGroups=
+    Object.values(data.groups)
+      .filter(g=>
+        g.members.includes(
+          currentUser.id
+        )
+      );
+
+
+  if(!myGroups.length){
+
+    groups.innerHTML=
+      `<div class="empty">
+        No groups yet.
+      </div>`;
+
+  }
+
+
+  myGroups.forEach(group=>{
+
+    const button=
+      document.createElement("button");
+
+    button.className=
+      "list-item "+
+      (
+        activeType==="group" &&
+        activeId===group.id
+          ? "active"
+          : ""
+      );
+
+
+    button.innerHTML=`
+
+      <div class="avatar">#</div>
+
+      <span>
+        ${escapeHTML(group.name)}
+      </span>
+
+    `;
+
+
+    button.onclick=
+      ()=>openGroup(group.id);
+
+
+    groups.appendChild(button);
+
+  });
+
+}
+
+
+/* =========================================================
+   FRIEND MODAL
+   ========================================================= */
+
+function openFriendModal(){
+
+  document
+    .getElementById("friendModal")
+    .classList.remove("hidden");
+
+}
+
+
+function addFriend(){
+
+  const peerId=
+    document
+      .getElementById(
+        "friendPeerInput"
+      )
+      .value.trim();
+
+  const name=
+    document
+      .getElementById(
+        "friendNameInput"
+      )
+      .value.trim();
+
+
+  if(!peerId){
+
+    toast("Enter the friend's Peer ID.");
+
+    return;
+
+  }
+
+
+  if(!name){
+
+    toast("Enter the friend's name.");
+
+    return;
+
+  }
+
+
+  if(peerId===peer?.id){
+
+    toast("That is your own Peer ID.");
+
+    return;
+
+  }
+
+
+  /*
+    Use Peer ID as a stable local contact key.
+  */
+
+  let existingId=null;
+
+  for(const id in data.users){
+
+    if(
+      data.users[id].peerId===peerId
+    ){
+
+      existingId=id;
+      break;
+
+    }
+
+  }
+
+
+  if(!existingId){
+
+    existingId=makeId();
+
+    data.users[existingId]={
+      id:existingId,
+      username:name,
+      admin:false,
+      peerId,
+      created:Date.now(),
+      lastSeen:null
+    };
+
+  }else{
+
+    data.users[existingId].username=name;
+
+  }
+
+
+  if(!data.friends[currentUser.id])
+    data.friends[currentUser.id]=[];
+
+
+  if(
+    !data.friends[currentUser.id]
+      .includes(existingId)
+  ){
+
+    data.friends[currentUser.id]
+      .push(existingId);
+
+  }
+
+
+  saveData();
+
+  closeModal("friendModal");
+
+  document.getElementById(
+    "friendPeerInput"
+  ).value="";
+
+  document.getElementById(
+    "friendNameInput"
+  ).value="";
+
+
+  renderSidebar();
+
+  openDM(existingId);
+
+  connectPeer(peerId);
+
+}
+
+
+/* =========================================================
+   DM
+   ========================================================= */
+
+function openDM(friendId){
+
+  const friend=
+    data.users[friendId];
+
+  if(!friend)
+    return;
+
+
+  activeType="dm";
+  activeId=friendId;
+
+
+  document.getElementById(
+    "chatTitle"
+  ).textContent=
+    friend.username;
+
+
+  document.getElementById(
+    "chatSub"
+  ).textContent=
+    friend.peerId
+      ? "P2P personal conversation"
+      : "Waiting for Peer ID";
+
+
+  document.getElementById(
+    "chatAvatar"
+  ).textContent=
+    initials(friend.username);
+
+
+  const input=
+    document.getElementById(
+      "messageInput"
+    );
+
+  input.disabled=false;
+
+  input.placeholder=
+    "Message "+friend.username+"...";
+
+
+  renderDM(friendId);
+
+  renderDMDetails(friendId);
+
+  renderSidebar();
+
+
+  /*
+    Automatically attempt connection
+    if we know the Peer ID.
+  */
+
+  if(friend.peerId){
+
+    if(
+      !connections[friend.peerId] ||
+      !connections[friend.peerId].open
+    ){
+
+      connectPeer(friend.peerId);
+
+    }
+
+  }
+
+}
+
+
+function renderDM(friendId){
+
+  const key=
+    conversationKey(
+      currentUser.id,
+      friendId
+    );
+
+  const messages=
+    data.conversations[key] || [];
+
+
+  renderMessages(messages);
+
+}
+
+
+function renderMessages(messages){
+
+  const box=
+    document.getElementById(
+      "messages"
+    );
+
+
+  if(!messages.length){
+
+    box.innerHTML=`
+
+      <div class="welcome">
+
+        <div class="welcome-box">
+
+          <h1>No messages yet</h1>
+
+          <p>
+            Start the conversation.
+          </p>
+
+        </div>
+
+      </div>
+
+    `;
+
+    return;
+
+  }
+
+
+  box.innerHTML="";
+
+
+  messages.forEach(message=>{
+
+    const mine=
+      message.sender===
+      currentUser.id;
+
+
+    const sender=
+      data.users[
+        message.sender
+      ];
+
+
+    const row=
+      document.createElement("div");
+
+    row.className=
+      "message "+
+      (mine?"mine":"");
+
+
+    row.innerHTML=`
+
+      <div class="avatar">
+        ${escapeHTML(
+          initials(
+            sender?.username||"User"
+          )
+        )}
+      </div>
+
+      <div class="message-body">
+
+        <div class="message-name">
+          ${escapeHTML(
+            sender?.username||"Unknown"
+          )}
+        </div>
+
+        <div class="bubble">
+          ${escapeHTML(message.text)}
+        </div>
+
+        <div class="time">
+          ${timeText(message.time)}
+        </div>
+
+      </div>
+
+    `;
+
+
+    box.appendChild(row);
+
+  });
+
+
+  box.scrollTop=
+    box.scrollHeight;
+
+}
+
+
+/* =========================================================
+   SEND DM
+   ========================================================= */
+
+function sendMessage(event){
+
+  event.preventDefault();
+
+
+  if(
+    !currentUser ||
+    !activeType ||
+    !activeId
+  )
+    return;
+
+
+  const input=
+    document.getElementById(
+      "messageInput"
+    );
+
+
+  const text=
+    input.value.trim();
+
+
+  if(!text)
+    return;
+
+
+  if(activeType==="dm"){
+
+    sendDM(text);
+
+  }else{
+
+    sendGroupMessage(text);
+
+  }
+
+
+  input.value="";
+
+}
+
+
+function sendDM(text){
+
+  const friend=
+    data.users[activeId];
+
+  if(!friend)
+    return;
+
+
+  const message={
+    id:makeId(),
+    sender:currentUser.id,
+    text,
+    time:Date.now()
+  };
+
+
+  const key=
+    conversationKey(
+      currentUser.id,
+      activeId
+    );
+
+
+  if(!data.conversations[key])
+    data.conversations[key]=[];
+
+
+  data.conversations[key]
+    .push(message);
+
+
+  saveData();
+
+  renderDM(activeId);
+
+
+  /*
+    Direct WebRTC send.
+  */
+
+  if(
+    friend.peerId &&
+    connections[friend.peerId] &&
+    connections[friend.peerId].open
+  ){
+
+    connections[friend.peerId].send({
+
+      type:"dm",
+
+      from:currentUser.id,
+
+      message
+
+    });
+
+  }else{
+
+    toast(
+      "Saved locally — friend is not connected."
+    );
+
+  }
+
+}
+
+
+/* =========================================================
+   RECEIVE DM
+   ========================================================= */
+
+function receiveDM(packet){
+
+  const senderId=
+    packet.from;
+
+  if(!senderId || !packet.message)
+    return;
+
+
+  if(!data.users[senderId]){
+
+    data.users[senderId]={
+      id:senderId,
+      username:
+        packet.message.username||
+        "Friend",
+      admin:false,
+      peerId:null,
+      created:Date.now()
+    };
+
+  }
+
+
+  const key=
+    conversationKey(
+      currentUser.id,
+      senderId
+    );
+
+
+  if(!data.conversations[key])
+    data.conversations[key]=[];
+
+
+  /*
+    Avoid duplicate message.
+  */
+
+  const exists=
+    data.conversations[key]
+      .some(
+        m=>m.id===packet.message.id
+      );
+
+
+  if(!exists){
+
+    data.conversations[key]
+      .push(packet.message);
+
+  }
+
+
+  saveData();
+
+
+  if(
+    activeType==="dm" &&
+    activeId===senderId
+  ){
+
+    renderDM(senderId);
+
+  }else{
+
+    toast(
+      "New message from "+
+      (
+        data.users[senderId]?.username||
+        "friend"
+      )
+    );
+
+  }
+
+
+  renderSidebar();
+
+}
+
+
+/* =========================================================
+   GROUPS
+   ========================================================= */
+
+function openGroupModal(){
+
+  document
+    .getElementById("groupModal")
+    .classList.remove("hidden");
+
+}
+
+
+function createGroup(){
+
+  const name=
+    document
+      .getElementById(
+        "groupNameInput"
+      )
+      .value.trim();
+
+
+  if(!name){
+
+    toast("Enter a group name.");
+
+    return;
+
+  }
+
+
+  const id=makeId();
+
+  const code=groupCode();
+
+
+  data.groups[id]={
+
+    id,
+
+    name,
+
+    code,
+
+    owner:currentUser.id,
+
+    members:[
+      currentUser.id
+    ],
+
+    messages:[],
+
+    created:Date.now()
+
+  };
+
+
+  saveData();
+
+  closeModal("groupModal");
+
+  document.getElementById(
+    "groupNameInput"
+  ).value="";
+
+
+  renderSidebar();
+
+  openGroup(id);
+
+  toast(
+    "Group created: "+code
+  );
+
+}
+
+
+function joinGroup(){
+
+  const code=
+    document
+      .getElementById(
+        "groupCodeInput"
+      )
+      .value
+      .trim()
+      .toUpperCase();
+
+
+  if(!code){
+
+    toast("Enter a group code.");
+
+    return;
+
+  }
+
+
+  const group=
+    Object.values(data.groups)
+      .find(g=>g.code===code);
+
+
+  if(!group){
+
+    toast(
+      "This group isn't in your local group list."
+    );
+
+    return;
+
+  }
+
+
+  if(
+    !group.members.includes(
+      currentUser.id
+    )
+  ){
+
+    group.members.push(
+      currentUser.id
+    );
+
+  }
+
+
+  saveData();
+
+  closeModal("groupModal");
+
+  document.getElementById(
+    "groupCodeInput"
+  ).value="";
+
+
+  renderSidebar();
+
+  openGroup(group.id);
+
+}
+
+
+/* =========================================================
+   GROUP CHAT
+   ========================================================= */
+
+function openGroup(groupId){
+
+  const group=
+    data.groups[groupId];
+
+  if(!group)
+    return;
+
+
+  if(
+    !group.members.includes(
+      currentUser.id
+    )
+  ){
+
+    toast("You are not a member.");
+
+    return;
+
+  }
+
+
+  activeType="group";
+  activeId=groupId;
+
+
+  document.getElementById(
+    "chatTitle"
+  ).textContent=
+    "# "+group.name;
+
+
+  document.getElementById(
+    "chatSub"
+  ).textContent=
+    group.members.length+
+    " members • "+group.code;
+
+
+  document.getElementById(
+    "chatAvatar"
+  ).textContent="#";
+
+
+  const input=
+    document.getElementById(
+      "messageInput"
+    );
+
+  input.disabled=false;
+
+  input.placeholder=
+    "Message #"+group.name+"...";
+
+
+  renderMessages(
+    group.messages||[]
+  );
+
+  renderGroupDetails(group);
+
+  renderSidebar();
+
+}
+
+
+function sendGroupMessage(text){
+
+  const group=
+    data.groups[activeId];
+
+  if(!group)
+    return;
+
+
+  const message={
+
+    id:makeId(),
+
+    sender:currentUser.id,
+
+    text,
+
+    time:Date.now()
+
+  };
+
+
+  if(!group.messages)
+    group.messages=[];
+
+
+  group.messages.push(message);
+
+
+  saveData();
+
+  renderMessages(
+    group.messages
+  );
+
+
+  /*
+    Send to all currently connected
+    group members.
+  */
+
+  group.members.forEach(memberId=>{
+
+    if(memberId===currentUser.id)
+      return;
+
+
+    const member=
+      data.users[memberId];
+
+    if(!member?.peerId)
+      return;
+
+
+    const conn=
+      connections[
+        member.peerId
+      ];
+
+
+    if(
+      conn &&
+      conn.open
+    ){
+
+      conn.send({
+
+        type:"group",
+
+        groupId:group.id,
+
+        groupName:group.name,
+
+        from:currentUser.id,
+
+        message
+
+      });
+
+    }
+
+  });
+
+}
+
+
+function receiveGroup(packet,conn){
+
+  let group=
+    data.groups[packet.groupId];
+
+
+  /*
+    If the receiving device doesn't
+    know the group yet, create a
+    lightweight local copy.
+  */
+
+  if(!group){
+
+    group={
+
+      id:packet.groupId,
+
+      name:
+        packet.groupName||
+        "Group",
+
+      code:"P2P",
+
+      owner:packet.from,
+
+      members:[
+        currentUser.id,
+        packet.from
+      ],
+
+      messages:[],
+
+      created:Date.now()
+
+    };
+
+
+    data.groups[group.id]=group;
+
+  }
+
+
+  if(!group.messages)
+    group.messages=[];
+
+
+  const exists=
+    group.messages.some(
+      m=>m.id===packet.message.id
+    );
+
+
+  if(!exists){
+
+    group.messages.push(
+      packet.message
+    );
+
+  }
+
+
+  /*
+    Add sender as member.
+  */
+
+  if(
+    packet.from &&
+    !group.members.includes(
+      packet.from
+    )
+  ){
+
+    group.members.push(
+      packet.from
+    );
+
+  }
+
+
+  saveData();
+
+
+  if(
+    activeType==="group" &&
+    activeId===group.id
+  ){
+
+    renderMessages(
+      group.messages
+    );
+
+  }else{
+
+    toast(
+      "New group message"
+    );
+
+  }
+
+}
+
+
+/* =========================================================
+   GROUP DETAILS
+   ========================================================= */
+
+function renderGroupDetails(group){
+
+  const members=
+    group.members
+      .map(id=>data.users[id])
+      .filter(Boolean);
+
+
+  document.getElementById(
+    "details"
+  ).innerHTML=`
+
+    <div class="detail-card">
+
+      <div class="detail-name">
+        # ${escapeHTML(group.name)}
+      </div>
+
+      <div class="detail-line">
+        Code:
+        <span class="copy"
+          onclick="copyText('${group.code}')">
+          ${escapeHTML(group.code)}
+        </span>
+      </div>
+
+      <div class="detail-line">
+        ${members.length} members
+      </div>
+
+      <div class="right-actions">
+
+        <button class="secondary"
+          onclick="copyText('${group.code}')">
+          Copy Group Code
+        </button>
+
+        <button class="danger"
+          onclick="leaveGroup('${group.id}')">
+          Leave Group
+        </button>
+
+      </div>
+
+    </div>
+
+    <div style="margin-top:18px">
+
+      <div class="right-title">
+        MEMBERS
+      </div>
+
+      ${members.map(m=>`
+
+        <div class="user-card">
+
+          <div class="card-info">
+
+            <div class="card-name">
+              ${escapeHTML(m.username)}
+            </div>
+
+            <div class="card-id">
+              ${escapeHTML(m.id)}
+            </div>
+
+          </div>
+
+          ${
+            m.peerId &&
+            connections[m.peerId] &&
+            connections[m.peerId].open
+              ? `<span class="badge">ONLINE</span>`
+              : ""
+          }
+
+        </div>
+
+      `).join("")}
+
+    </div>
+
+  `;
+
+}
+
+
+function leaveGroup(groupId){
+
+  const group=
+    data.groups[groupId];
+
+  if(!group)
+    return;
+
+
+  group.members=
+    group.members.filter(
+      id=>id!==currentUser.id
+    );
+
+
+  if(
+    group.owner===
+    currentUser.id
+  ){
+
+    if(group.members.length){
+
+      group.owner=
+        group.members[0];
+
+    }else{
+
+      delete data.groups[groupId];
+
+    }
+
+  }
+
+
+  saveData();
+
+
+  activeType=null;
+  activeId=null;
+
+
+  renderSidebar();
+  renderWelcome();
+
+  toast("Left group.");
+
+}
+
+
+/* =========================================================
+   DM DETAILS
+   ========================================================= */
+
+function renderDMDetails(friendId){
+
+  const friend=
+    data.users[friendId];
+
+
+  if(!friend)
+    return;
+
+
+  const online=
+    friend.peerId &&
+    connections[friend.peerId] &&
+    connections[friend.peerId].open;
+
+
+  document.getElementById(
+    "details"
+  ).innerHTML=`
+
+    <div class="detail-card">
+
+      <div class="avatar"
+           style="width:50px;height:50px;margin-bottom:12px">
+
+        ${escapeHTML(
+          initials(friend.username)
+        )}
+
+      </div>
+
+
+      <div class="detail-name">
+        ${escapeHTML(friend.username)}
+      </div>
+
+
+      <div class="detail-line">
+        ${online?"● Connected":"● Offline"}
+      </div>
+
+
+      <div class="detail-line">
+        Peer ID
+      </div>
+
+
+      <div class="detail-line copy"
+           onclick="copyText('${friend.peerId||""}')">
+
+        ${escapeHTML(
+          friend.peerId||
+          "Not available"
+        )}
+
+      </div>
+
+
+      <div class="right-actions">
+
+        ${
+          friend.peerId
+            ? `
+              <button class="secondary"
+                onclick="connectPeer('${friend.peerId}')">
+                Connect
+              </button>
+            `
+            : ""
+        }
+
+
+        <button class="danger"
+          onclick="removeFriend('${friendId}')">
+          Remove Friend
+        </button>
+
+      </div>
+
+    </div>
+
+  `;
+
+}
+
+
+/* =========================================================
+   REMOVE FRIEND
+   ========================================================= */
+
+function removeFriend(id){
+
+  data.friends[currentUser.id]=
+    getFriends().filter(
+      x=>x!==id
+    );
+
+
+  saveData();
+
+
+  activeType=null;
+  activeId=null;
+
+
+  renderSidebar();
+  renderWelcome();
+
+
+  toast("Friend removed.");
+
+}
+
+
+/* =========================================================
+   CONNECTION MODAL
+   ========================================================= */
+
+function openConnectionModal(){
+
+  document
+    .getElementById(
+      "connectionModal"
+    )
+    .classList.remove("hidden");
+
+
+  document.getElementById(
+    "myPeerId"
+  ).value=
+    peer?.id||
+    "Starting...";
+
+
+  document.getElementById(
+    "myBaseId"
+  ).value=
+    currentUser.id;
+
+}
+
+
+/* =========================================================
+   PROFILE
+   ========================================================= */
+
+function openProfileModal(){
+
+  document.getElementById(
+    "profileName"
+  ).value=
+    currentUser.username;
+
+
+  document.getElementById(
+    "profileId"
+  ).value=
+    currentUser.id;
+
+
+  document
+    .getElementById(
+      "profileModal"
+    )
+    .classList.remove("hidden");
+
+}
+
+
+function saveProfile(){
+
+  const name=
+    document
+      .getElementById(
+        "profileName"
+      )
+      .value.trim();
+
+
+  if(name.length<2){
+
+    toast(
+      "Username is too short."
+    );
+
+    return;
+
+  }
+
+
+  currentUser.username=name;
+
+
+  const user=
+    data.users[currentUser.id];
+
+
+  if(user){
+
+    user.username=name;
+    user.lastSeen=Date.now();
+
+  }
+
+
+  saveData();
+  saveSession();
+
+
+  document.getElementById(
+    "meName"
+  ).textContent=
+    name+
+    (currentUser.admin?" ⚙":"");
+
+
+  closeModal("profileModal");
+
+  renderSidebar();
+
+  toast("Profile saved.");
+
+}
+
+
+/* =========================================================
+   ADMIN
+   ========================================================= */
+
+function openAdmin(){
+
+  if(!currentUser.admin)
+    return;
+
+
+  document
+    .getElementById(
+      "adminModal"
+    )
+    .classList.remove("hidden");
+
+
+  renderAdmin();
+
+}
+
+
+function renderAdmin(){
+
+  const users=
+    Object.values(data.users);
+
+  const groups=
+    Object.values(data.groups);
+
+
+  let messageCount=0;
+
+
+  Object.values(
+    data.conversations
+  ).forEach(a=>{
+    messageCount+=a.length;
+  });
+
+
+  groups.forEach(g=>{
+    messageCount+=
+      (g.messages||[]).length;
+  });
+
+
+  document.getElementById(
+    "adminContent"
+  ).innerHTML=`
+
+    <div class="notice">
+
+      <b>Administrator accounts</b><br><br>
+
+      admin1 → 12<br>
+      admin2 → 21<br>
+      admin3 → 11
+
+    </div>
+
+
+    <div class="user-card">
+
+      <div>
+        <div class="card-name">
+          Local users
+        </div>
+        <div class="card-id">
+          Stored in this browser
+        </div>
+      </div>
+
+      <b>${users.length}</b>
+
+    </div>
+
+
+    <div class="user-card">
+
+      <div>
+        <div class="card-name">
+          Groups
+        </div>
+      </div>
+
+      <b>${groups.length}</b>
+
+    </div>
+
+
+    <div class="user-card">
+
+      <div>
+        <div class="card-name">
+          Messages
+        </div>
+      </div>
+
+      <b>${messageCount}</b>
+
+    </div>
+
+
+    <h3 style="margin:20px 0 10px">
+      Users
+    </h3>
+
+
+    ${
+      users.map(u=>`
+
+        <div class="user-card">
+
+          <div class="card-info">
+
+            <div class="card-name">
+
+              ${escapeHTML(u.username)}
+
+              ${
+                u.admin
+                  ? `<span class="badge">
+                      ADMIN
+                    </span>`
+                  : ""
+              }
+
+            </div>
+
+
+            <div class="card-id">
+              ${escapeHTML(u.id)}
+            </div>
+
+
+            <div class="card-id">
+              Peer:
+              ${escapeHTML(
+                u.peerId||"Not connected"
+              )}
+            </div>
+
+          </div>
+
+
+          ${
+            u.admin
+              ? `<span class="badge">
+                  PROTECTED
+                </span>`
+              : `
+                <button class="danger"
+                  onclick="adminDeleteUser('${u.id}')">
+                  Delete
+                </button>
+              `
+          }
+
+        </div>
+
+      `).join("")
+    }
+
+
+    <h3 style="margin:20px 0 10px">
+      Groups
+    </h3>
+
+
+    ${
+      groups.length
+        ?
+        groups.map(g=>`
+
+          <div class="group-card">
+
+            <div class="card-info">
+
+              <div class="card-name">
+                # ${escapeHTML(g.name)}
+              </div>
+
+              <div class="card-id">
+                Code: ${escapeHTML(g.code)}
+              </div>
+
+              <div class="card-id">
+                Members: ${g.members.length}
+              </div>
+
+            </div>
+
+
+            <button class="danger"
+              onclick="adminDeleteGroup('${g.id}')">
+              Delete
+            </button>
+
+          </div>
+
+        `).join("")
+        :
+        `<div class="empty">
+          No groups.
+        </div>`
+    }
+
+
+    <button class="danger"
+      style="width:100%;margin-top:20px"
+      onclick="adminReset()">
+
+      Reset Local BaseCamp Data
+
+    </button>
+
+  `;
+
+}
+
+
+function adminDeleteUser(id){
+
+  const user=
+    data.users[id];
+
+
+  if(!user || user.admin){
+
+    toast(
+      "This account is protected."
+    );
+
+    return;
+
+  }
+
+
+  if(!confirm(
+    "Delete "+user.username+"?"
+  ))
+    return;
+
+
+  delete data.users[id];
+
+
+  for(const owner in data.friends){
+
+    data.friends[owner]=
+      data.friends[owner]
+        .filter(x=>x!==id);
+
+  }
+
+
+  for(const key in data.conversations){
+
+    if(key.includes(id))
+      delete data.conversations[key];
+
+  }
+
+
+  for(const gid in data.groups){
+
+    const g=
+      data.groups[gid];
+
+    g.members=
+      g.members.filter(
+        x=>x!==id
+      );
+
+
+    if(g.owner===id){
+
+      if(g.members.length){
+
+        g.owner=
+          g.members[0];
+
+      }else{
+
+        delete data.groups[gid];
+
+      }
+
+    }
+
+  }
+
+
+  saveData();
+
+  renderSidebar();
+  renderAdmin();
+
+  toast("User deleted.");
+
+}
+
+
+function adminDeleteGroup(id){
+
+  if(!confirm(
+    "Delete this group?"
+  ))
+    return;
+
+
+  delete data.groups[id];
+
+  saveData();
+
+
+  if(
+    activeType==="group" &&
+    activeId===id
+  ){
+
+    activeType=null;
+    activeId=null;
+
+    renderWelcome();
+
+  }
+
+
+  renderSidebar();
+  renderAdmin();
+
+  toast("Group deleted.");
+
+}
+
+
+function adminReset(){
+
+  if(!confirm(
+    "Reset all local BaseCamp data?"
+  ))
+    return;
+
+
+  data=freshData();
+
+
+  Object.keys(ADMINS)
+    .forEach(name=>{
+
+      const id=
+        "ADMIN-"+
+        name.toUpperCase();
+
+
+      data.users[id]={
+
+        id,
+
+        username:name,
+
+        admin:true,
+
+        peerId:null,
+
+        created:Date.now(),
+
+        lastSeen:Date.now()
+
+      };
+
+    });
+
+
+  saveData();
+
+
+  activeType=null;
+  activeId=null;
+
+
+  renderSidebar();
+  renderWelcome();
+  renderAdmin();
+
+
+  toast("Local data reset.");
+
+}
+
+
+/* =========================================================
+   WELCOME
+   ========================================================= */
+
+function renderWelcome(){
+
+  document.getElementById(
+    "chatTitle"
+  ).textContent=
+    "Welcome to BaseCamp";
+
+
+  document.getElementById(
+    "chatSub"
+  ).textContent=
+    "P2P Channels";
+
+
+  document.getElementById(
+    "chatAvatar"
+  ).textContent="BC";
+
+
+  document.getElementById(
+    "messageInput"
+  ).disabled=true;
+
+
+  document.getElementById(
+    "messageInput"
+  ).placeholder=
+    "Select a friend or group...";
+
+
+  document.getElementById(
+    "messages"
+  ).innerHTML=`
+
+    <div class="welcome">
+
+      <div class="welcome-box">
+
+        <h1>
+          Welcome to BaseCamp ⚡
+        </h1>
+
+        <p>
+          Connect another device using
+          the Connections button.
+          Then add it as a friend.
+        </p>
+
+      </div>
+
+    </div>
+
+  `;
+
+
+  document.getElementById(
+    "details"
+  ).innerHTML=`
+
+    <div class="detail-card">
+
+      <div class="detail-name">
+        BaseCamp P2P
+      </div>
+
+      <div class="detail-line">
+        Direct WebRTC messaging.
+      </div>
+
+    </div>
+
+  `;
+
+}
+
+
+/* =========================================================
+   STATUS
+   ========================================================= */
+
+function updateConnectionStatus(text,online=false){
+
+  const el=
+    document.getElementById(
+      "connectionStatus"
+    );
+
+  if(!el)
+    return;
+
+
+  el.textContent=text;
+
+  el.classList.toggle(
+    "online",
+    online
+  );
+
+}
+
+
+/* =========================================================
+   MODALS
+   ========================================================= */
+
+function closeModal(id){
+
+  document
+    .getElementById(id)
+    .classList.add("hidden");
+
+}
+
+
+document
+  .querySelectorAll(".modal")
+  .forEach(modal=>{
+
+    modal.addEventListener(
+      "click",
+      e=>{
+
+        if(e.target===modal)
+          modal.classList.add("hidden");
+
+      }
+    );
+
+  });
+
+
+/* =========================================================
+   COPY
+   ========================================================= */
+
+function copyMyPeerId(){
+
+  if(peer?.id)
+    copyText(peer.id);
+}
+
+
+/* =========================================================
+   KEYBOARD
+   ========================================================= */
+
+document
+  .getElementById("messageInput")
+  .addEventListener(
+    "keydown",
+    e=>{
+
+      if(
+        e.key==="Enter" &&
+        !e.shiftKey
+      ){
+
+        e.preventDefault();
+
+        e.target
+          .form
+          .requestSubmit();
+
+      }
+
+    }
+  );
+
+
+document
+  .getElementById("loginUsername")
+  .addEventListener(
+    "keydown",
+    e=>{
+      if(e.key==="Enter")
+        login();
+    }
+  );
+
+
+document
+  .getElementById("loginPassword")
+  .addEventListener(
+    "keydown",
+    e=>{
+      if(e.key==="Enter")
+        login();
+    }
+  );
+
+
+/* =========================================================
+   START
+   ========================================================= */
+
+function initialize(){
+
+  loadSession();
+
+
+  if(currentUser){
+
+    if(data.users[currentUser.id]){
+
+      enterApp();
+
+      return;
+
+    }
+
+  }
+
+
+  renderWelcome();
+
+}
+
+initialize();
+
+</script>
+
 </body>
 </html>
